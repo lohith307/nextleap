@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zomato AI - Personalized Restaurant Recommendations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            zomato: {
+              DEFAULT: '#E23744',
+              dark: '#cb202d',
+              light: '#fff2f2',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+    }
+    .badge-rating {
+      background-color: #24963f;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col font-sans">
+
+  <!-- Header / Navigation -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="text-2xl font-black text-zomato tracking-tight">zomato<span class="text-xs bg-red-100 text-zomato px-2 py-0.5 rounded-full font-bold ml-1.5 uppercase">AI</span></span>
+        <span class="text-xs text-gray-400 border-l pl-3 hidden sm:inline">Restaurant Discovery Engine</span>
+      </div>
+      <div class="flex items-center space-x-3 text-xs">
+        <span id="engineBadge" class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full font-medium border border-emerald-200 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="engineStatus">AI Ready</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="bg-gradient-to-b from-red-50 via-white to-gray-50 py-10 border-b border-gray-100">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+        Discover restaurants with <span class="text-zomato">AI-Powered Reasoning</span>
+      </h1>
+      <p class="mt-3 text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
+        Structured catalog filtering combined with LLM ranking to give you tailored recommendations and personalized justifications.
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Content Layout -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+    <!-- Left Column: Preference Input Form (Phase 2 & 6) -->
+    <div class="lg:col-span-5">
+      <div class="glass-card rounded-2xl shadow-sm border border-gray-200/80 p-6 sticky top-24">
+        <div class="flex items-center justify-between pb-4 border-b border-gray-100 mb-5">
+          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-zomato" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            Your Preferences
+          </h2>
+          <span class="text-xs text-gray-400">Step 1: Filter & Step 2: Rank</span>
+        </div>
+
+        <form id="recommendForm" class="space-y-4">
+          <!-- Location Input -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5" for="location">Location *</label>
+            <div class="relative">
+              <input type="text" id="location" name="location" list="locationsList" placeholder="e.g. Banashankari, Koramangala, Indiranagar" required
+                class="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-zomato focus:border-transparent transition">
+              <datalist id="locationsList"></datalist>
+            </div>
+            <div class="flex flex-wrap gap-1.5 mt-2" id="quickLocations">
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="location" data-val="Koramangala">Koramangala</button>
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="location" data-val="Indiranagar">Indiranagar</button>
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="location" data-val="Whitefield">Whitefield</button>
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="location" data-val="HSR">HSR</button>
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="location" data-val="BTM">BTM</button>
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="location" data-val="Jayanagar">Jayanagar</button>
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="location" data-val="Bangalore">All Bangalore</button>
+            </div>
+          </div>
+
+          <!-- Cuisine Input -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5" for="cuisine">Cuisine *</label>
+            <input type="text" id="cuisine" name="cuisine" list="cuisinesList" placeholder="e.g. Italian, North Indian, Cafe, Biryani" required
+              class="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-zomato focus:border-transparent transition">
+            <datalist id="cuisinesList"></datalist>
+            <div class="flex flex-wrap gap-1.5 mt-2">
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="cuisine" data-val="North Indian">North Indian</button>
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="cuisine" data-val="South Indian">South Indian</button>
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="cuisine" data-val="Biryani">Biryani</button>
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="cuisine" data-val="Chinese">Chinese</button>
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="cuisine" data-val="Italian">Italian</button>
+              <button type="button" class="quick-chip text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition" data-target="cuisine" data-val="Cafe">Cafe</button>
+            </div>
+          </div>
+
+          <!-- Budget Selection -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">Budget *</label>
+            <div class="grid grid-cols-3 gap-2.5">
+              <label class="border rounded-xl p-2.5 text-center cursor-pointer transition hover:border-gray-400 has-[:checked]:border-zomato has-[:checked]:bg-red-50/50 has-[:checked]:text-zomato">
+                <input type="radio" name="budget" value="low" class="sr-only">
+                <div class="text-sm font-bold">Low</div>
+                <div class="text-[11px] text-gray-500">≤ ₹350</div>
+              </label>
+              <label class="border rounded-xl p-2.5 text-center cursor-pointer transition hover:border-gray-400 has-[:checked]:border-zomato has-[:checked]:bg-red-50/50 has-[:checked]:text-zomato">
+                <input type="radio" name="budget" value="medium" class="sr-only" checked>
+                <div class="text-sm font-bold">Medium</div>
+                <div class="text-[11px] text-gray-500">₹300 - ₹600</div>
+              </label>
+              <label class="border rounded-xl p-2.5 text-center cursor-pointer transition hover:border-gray-400 has-[:checked]:border-zomato has-[:checked]:bg-red-50/50 has-[:checked]:text-zomato">
+                <input type="radio" name="budget" value="high" class="sr-only">
+                <div class="text-sm font-bold">High</div>
+                <div class="text-[11px] text-gray-500">₹500+</div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Minimum Rating Slider -->
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label class="text-xs font-semibold uppercase tracking-wider text-gray-600" for="min_rating">Minimum Rating</label>
+              <span id="ratingDisplay" class="text-xs font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded">3.8 ★</span>
+            </div>
+            <input type="range" id="min_rating" name="min_rating" min="3.0" max="4.8" step="0.1" value="3.8"
+              class="w-full accent-zomato cursor-pointer">
+            <div class="flex justify-between text-[10px] text-gray-400 mt-0.5">
+              <span>3.0</span>
+              <span>4.0</span>
+              <span>4.8</span>
+            </div>
+          </div>
+
+          <!-- Additional Preferences -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5" for="additional_preferences">
+              Additional Preferences <span class="text-gray-400 normal-case font-normal">(optional free text)</span>
+            </label>
+            <input type="text" id="additional_preferences" name="additional_preferences" placeholder="e.g. family-friendly, table booking, quick bites"
+              class="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-zomato focus:border-transparent transition">
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="submitBtn"
+            class="w-full bg-zomato hover:bg-zomato-dark text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 mt-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span>Find & Recommend</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Column: Results & AI Explanations (Phase 6 & 8) -->
+    <div class="lg:col-span-7 space-y-6">
+
+      <!-- Summary Banner (AI Generated) -->
+      <div id="summaryCard" class="hidden p-4 rounded-2xl bg-gradient-to-r from-red-50 to-orange-50 border border-red-200/80">
+        <div class="flex items-start gap-3">
+          <div class="p-2 bg-red-100 text-zomato rounded-xl">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-zomato">AI Overview</h3>
+            <p id="summaryText" class="text-sm text-gray-800 font-medium mt-1 leading-relaxed"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State Skeleton -->
+      <div id="loadingState" class="hidden space-y-4">
+        <div class="text-center py-6">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-zomato border-t-transparent mb-2"></div>
+          <p class="text-sm font-semibold text-gray-700">Filtering catalog & querying LLM reasoning engine...</p>
+        </div>
+        <div class="h-32 bg-gray-200/60 rounded-2xl animate-pulse"></div>
+        <div class="h-32 bg-gray-200/60 rounded-2xl animate-pulse"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="p-10 rounded-2xl bg-white border border-gray-200 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 bg-red-50 text-zomato rounded-full flex items-center justify-center">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <h3 id="emptyTitle" class="text-base font-bold text-gray-900">Ready for recommendations</h3>
+        <p id="emptyMessage" class="text-sm text-gray-500 mt-1 max-w-md mx-auto">
+          Specify your location, preferred cuisine, and budget on the left to see ranked restaurants with AI justifications.
+        </p>
+      </div>
+
+      <!-- Recommendation Cards Container (5 required display fields) -->
+      <div id="recommendationsList" class="space-y-4"></div>
+
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-gray-200 py-6 mt-12 text-center text-xs text-gray-400">
+    AI-Powered Restaurant Recommendation System &bull; Powered by Zomato Dataset &amp; LLM Integration
+  </footer>
+
+  <script>
+    const form = document.getElementById('recommendForm');
+    const locationInput = document.getElementById('location');
+    const cuisineInput = document.getElementById('cuisine');
+    const minRatingInput = document.getElementById('min_rating');
+    const ratingDisplay = document.getElementById('ratingDisplay');
+    const summaryCard = document.getElementById('summaryCard');
+    const summaryText = document.getElementById('summaryText');
+    const loadingState = document.getElementById('loadingState');
+    const emptyState = document.getElementById('emptyState');
+    const emptyTitle = document.getElementById('emptyTitle');
+    const emptyMessage = document.getElementById('emptyMessage');
+    const recommendationsList = document.getElementById('recommendationsList');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Update rating display
+    minRatingInput.addEventListener('input', (e) => {
+      ratingDisplay.textContent = `${parseFloat(e.target.value).toFixed(1)} ★`;
+    });
+
+    // Quick chips handler
+    document.querySelectorAll('.quick-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const val = btn.getAttribute('data-val');
+        document.getElementById(targetId).value = val;
+      });
+    });
+
+    // Fetch initial health & datalists
+    async function init() {
+      try {
+        const healthRes = await fetch('/api/health');
+        if (healthRes.ok) {
+          const data = await healthRes.json();
+          document.getElementById('engineStatus').textContent = `${data.llm_engine} (${data.total_restaurants} restaurants)`;
+        }
+      } catch (err) {
+        console.warn('API health check error:', err);
+      }
+
+      try {
+        const [locRes, cuiRes] = await Promise.all([
+          fetch('/api/locations'),
+          fetch('/api/cuisines')
+        ]);
+        if (locRes.ok) {
+          const locs = await locRes.json();
+          const datalist = document.getElementById('locationsList');
+          datalist.innerHTML = locs.map(l => `<option value="${l}">`).join('');
+        }
+        if (cuiRes.ok) {
+          const cuis = await cuiRes.json();
+          const datalist = document.getElementById('cuisinesList');
+          datalist.innerHTML = cuis.slice(0, 30).map(c => `<option value="${c}">`).join('');
+        }
+      } catch (err) {
+        console.warn('Datalist fetch error:', err);
+      }
+    }
+
+    init();
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const budgetVal = document.querySelector('input[name="budget"]:checked').value;
+      const payload = {
+        location: locationInput.value.trim(),
+        cuisine: cuisineInput.value.trim(),
+        budget: budgetVal,
+        min_rating: parseFloat(minRatingInput.value),
+        additional_preferences: document.getElementById('additional_preferences').value.trim()
+      };
+
+      // UI states
+      emptyState.classList.add('hidden');
+      summaryCard.classList.add('hidden');
+      recommendationsList.innerHTML = '';
+      loadingState.classList.remove('hidden');
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/recommend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        loadingState.classList.add('hidden');
+        submitBtn.disabled = false;
+
+        if (!res.ok) {
+          let errDetail = 'Could not fetch recommendations. Please check inputs.';
+          if (typeof data.detail === 'string') {
+            errDetail = data.detail;
+          } else if (Array.isArray(data.detail)) {
+            errDetail = data.detail.map(d => d.msg || d.message || JSON.stringify(d)).join(', ');
+          }
+          showEmpty('Validation Error', errDetail);
+          return;
+        }
+
+        if (!data.recommendations || data.recommendations.length === 0) {
+          showEmpty('No Matching Restaurants', data.message || 'No restaurants matched all filters. Try lowering minimum rating or changing location.');
+          return;
+        }
+
+        // Render AI Summary if present
+        if (data.summary) {
+          summaryText.textContent = data.summary;
+          summaryCard.classList.remove('hidden');
+        }
+
+        // Render notice if search was broadened or note provided
+        let cardsHtml = '';
+        if (data.message) {
+          cardsHtml += `
+            <div class="p-3.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-medium flex items-center gap-2">
+              <svg class="w-4 h-4 text-amber-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+              <span>${escapeHtml(data.message)}</span>
+            </div>
+          `;
+        }
+
+        cardsHtml += data.recommendations.map(r => `
+          <div class="glass-card rounded-2xl p-5 border border-gray-200/80 shadow-sm hover:shadow-md transition">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <span class="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 text-zomato font-black text-sm flex items-center justify-center">
+                  #${r.rank}
+                </span>
+                <div>
+                  <!-- 1. Restaurant Name -->
+                  <h3 class="text-lg font-bold text-gray-900">${escapeHtml(r.name)}</h3>
+                  <!-- 2. Cuisine -->
+                  <div class="text-xs text-gray-500 mt-0.5">${escapeHtml(r.cuisine)}</div>
+                </div>
+              </div>
+              <div class="flex flex-col items-end">
+                <!-- 3. Rating -->
+                <span class="inline-flex items-center gap-1 text-xs font-bold text-white badge-rating px-2.5 py-1 rounded-lg shadow-sm">
+                  ${r.rating.toFixed(1)} ★
+                </span>
+                <!-- 4. Estimated Cost -->
+                <span class="text-xs font-semibold text-gray-600 mt-1">
+                  ₹${Math.round(r.estimated_cost)} for two
+                </span>
+              </div>
+            </div>
+
+            <!-- 5. AI-generated Explanation -->
+            <div class="mt-4 pt-3 border-t border-gray-100 bg-red-50/40 rounded-xl p-3">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-zomato flex items-center gap-1.5 mb-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Why this matches you:
+              </div>
+              <p class="text-sm text-gray-700 leading-relaxed">${escapeHtml(r.explanation)}</p>
+            </div>
+        `).join('');
+        recommendationsList.innerHTML = cardsHtml;
+
+      } catch (err) {
+        console.error(err);
+        loadingState.classList.add('hidden');
+        submitBtn.disabled = false;
+        showEmpty('Connection Error', 'Could not reach the recommendation server. Please ensure backend is running.');
+      }
+    });
+
+    function showEmpty(title, msg) {
+      emptyTitle.textContent = title;
+      emptyMessage.textContent = msg;
+      emptyState.classList.remove('hidden');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
