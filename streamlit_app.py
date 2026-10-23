@@ -1,10 +1,12 @@
 """
 Zomato AI Restaurant Recommendation System - Streamlit Web Application
 Combines structured catalog retrieval with grounded LLM reasoning for personalized recommendations.
-Replicates the ultra-premium dark-mode design system from ui/index.html with pristine sidebar controls.
+Features the exact ultra-premium dark-mode design system, budget number pills, and interactive map split-view from ui/index.html.
 """
 import os
+import json
 import streamlit as st
+import streamlit.components.v1 as components
 from domain.models import UserPreference, BudgetBand
 from ingestion.repo import RestaurantRepo
 from filters.candidate_filter import CandidateFilterEngine
@@ -54,7 +56,7 @@ st.markdown(
       --font:           'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* CRITICAL FIX: Protect Streamlit Material Symbols Icons from broken ligatures (e.g. keyboard_double) */
+    /* Protect Streamlit Material Symbols Icons from broken ligatures */
     [data-testid="stSidebarCollapseButton"] span,
     [data-testid="collapsedControl"] span,
     [data-testid="stIconMaterial"],
@@ -164,7 +166,7 @@ st.markdown(
     /* Hero Banner */
     .hero-banner {
         text-align: center;
-        padding: 40px 20px 30px;
+        padding: 36px 20px 26px;
         background: radial-gradient(circle at 50% -20%, #2b0207 0%, #170005 45%, var(--bg) 85%);
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-lg);
@@ -198,10 +200,10 @@ st.markdown(
         -webkit-text-fill-color: transparent;
     }
     .hero-subtitle {
-        font-size: 14.5px;
+        font-size: 14px;
         color: var(--text-2);
         max-width: 600px;
-        margin: 0 auto 18px;
+        margin: 0 auto 16px;
         line-height: 1.6;
     }
     .hero-badges {
@@ -224,7 +226,7 @@ st.markdown(
         color: var(--text-2);
     }
 
-    /* Sidebar Header Redesign */
+    /* Sidebar Header */
     .sidebar-header-box {
         display: flex;
         align-items: center;
@@ -257,7 +259,7 @@ st.markdown(
         letter-spacing: 0.6px;
     }
 
-    /* Sidebar Clean Field Labels */
+    /* Sidebar Field Labels */
     .sidebar-label {
         font-size: 10.5px;
         font-weight: 800;
@@ -274,7 +276,7 @@ st.markdown(
         color: var(--brand);
     }
 
-    /* Segmented Control Styling - 3 Sleek Equal Width Cards */
+    /* Segmented Control Styling - 3 Equal-Width Horizontal Cards */
     div[data-testid="stSegmentedControl"] {
         width: 100% !important;
         margin-bottom: 4px !important;
@@ -290,7 +292,7 @@ st.markdown(
         background-color: #19191F !important;
         border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 10px !important;
-        padding: 9px 2px !important;
+        padding: 10px 4px !important;
         color: #94A3B8 !important;
         font-size: 11px !important;
         font-weight: 700 !important;
@@ -313,7 +315,7 @@ st.markdown(
         box-shadow: 0 0 14px rgba(226, 55, 68, 0.3) !important;
     }
 
-    /* Fallback Clean stRadio (Never create giant label card or show radio circles) */
+    /* Fallback Clean stRadio */
     div[data-testid="stRadio"] > label,
     div[data-testid="stRadio"] label[data-testid="stWidgetLabel"] {
         display: none !important;
@@ -417,120 +419,6 @@ st.markdown(
         font-size: 13.5px;
         color: #E2E8F0;
         line-height: 1.6;
-    }
-
-    /* Recommendation Cards */
-    .rec-card {
-        background: var(--bg-panel);
-        border: 1.5px solid var(--border-subtle);
-        border-radius: var(--radius-lg);
-        padding: 20px 22px;
-        margin-bottom: 16px;
-        transition: all 0.22s ease;
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-    }
-    .rec-card:hover {
-        border-color: rgba(226, 55, 68, 0.45);
-        background: var(--bg-card);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 16px rgba(226, 55, 68, 0.15);
-    }
-    .card-top {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 14px;
-        margin-bottom: 8px;
-    }
-    .card-left-meta {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    .card-rank {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        background: rgba(226, 55, 68, 0.15);
-        border: 1px solid rgba(226, 55, 68, 0.35);
-        color: var(--brand);
-        font-size: 13px;
-        font-weight: 800;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    .card-name {
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: #FFFFFF;
-        letter-spacing: -0.3px;
-        margin: 0;
-    }
-    .rating-badge-green {
-        background: var(--rating-green);
-        color: #FFFFFF;
-        font-size: 12.5px;
-        font-weight: 800;
-        padding: 3px 9px;
-        border-radius: 6px;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
-    }
-    .card-subline {
-        font-size: 13px;
-        color: var(--text-2);
-        margin-bottom: 10px;
-    }
-    .card-meta-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        font-size: 12.5px;
-        color: var(--text-2);
-        margin-bottom: 12px;
-    }
-    .cost-highlight {
-        color: #FFFFFF;
-        font-weight: 700;
-    }
-    .tag-chip {
-        display: inline-block;
-        padding: 3px 9px;
-        background: #181820;
-        border: 1px solid var(--border-subtle);
-        border-radius: 99px;
-        color: var(--text-2);
-        font-size: 11px;
-        font-weight: 600;
-    }
-    .card-reason-box {
-        background: rgba(226, 55, 68, 0.06);
-        border: 1px solid rgba(226, 55, 68, 0.16);
-        border-left: 3px solid var(--brand);
-        border-radius: var(--radius-md);
-        padding: 12px 16px;
-        margin-top: 10px;
-    }
-    .reason-label {
-        font-size: 10.5px;
-        font-weight: 800;
-        color: var(--brand);
-        text-transform: uppercase;
-        letter-spacing: 0.7px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        margin-bottom: 5px;
-    }
-    .reason-text {
-        font-size: 12.8px;
-        color: #F1F5F9;
-        line-height: 1.5;
     }
 
     /* Streamlit Form Control Overrides */
@@ -638,7 +526,7 @@ st.markdown(
 
 
 # ---------------------------------------------------------
-# Sidebar: Redesigned Preferences Form (Matches ui/index.html)
+# Sidebar: Preferences Form
 # ---------------------------------------------------------
 with st.sidebar:
     st.markdown(
@@ -685,27 +573,35 @@ with st.sidebar:
         label_visibility="collapsed",
     )
 
-    # 3. Budget Tier (Rendered as 3 sleek horizontal cards)
+    # 3. Budget Tier (Showing exact dynamic numbers)
+    p33 = int(repo.p33_cost)
+    p66 = int(repo.p66_cost)
+    
     st.markdown(
         f'<div class="sidebar-label">BUDGET TIER <span style="font-weight: 500; font-size: 10px; color: #64748B;">'
-        f'(p33: ₹{int(repo.p33_cost)} • p66: ₹{int(repo.p66_cost)})</span></div>',
+        f'(Under ₹{p33} • ₹{p33}-₹{p66} • Above ₹{p66})</span></div>',
         unsafe_allow_html=True,
     )
+    
+    # Clearly show numbers on each option
     budget_card_map = {
-        "₹ Budget": BudgetBand.LOW,
-        "₹₹ Mid-Range": BudgetBand.MEDIUM,
-        "₹₹₹ Fine Dining": BudgetBand.HIGH,
+        f"₹ < ₹{p33}": BudgetBand.LOW,
+        f"₹₹ ₹{p33}-₹{p66}": BudgetBand.MEDIUM,
+        f"₹₹₹ > ₹{p66}": BudgetBand.HIGH,
     }
+    
+    default_budget_label = f"₹₹ ₹{p33}-₹{p66}"
+    
     if hasattr(st, "segmented_control"):
         budget_choice = st.segmented_control(
             "Budget Tier",
             options=list(budget_card_map.keys()),
-            default="₹₹ Mid-Range",
+            default=default_budget_label,
             label_visibility="collapsed",
             width="stretch",
         )
         if not budget_choice:
-            budget_choice = "₹₹ Mid-Range"
+            budget_choice = default_budget_label
     else:
         budget_choice = st.radio(
             "Budget Tier",
@@ -898,62 +794,703 @@ if pref_to_run:
                     unsafe_allow_html=True,
                 )
 
-            # Step 6: Render Recommendations Header
+            # Step 6: Build JSON Payload for Interactive Split-View Map & Cards
+            recs_json_list = []
+            cand_map = {c.id: c for c in candidates}
+            for idx, rec in enumerate(recommendations, 1):
+                cand = cand_map.get(rec.id)
+                cand_loc = cand.location if cand else pref_to_run.location
+                
+                # Deterministic coordinate placement for Bengaluru area map canvas
+                base_x = 24 + ((idx * 29 + 11) % 52)
+                base_y = 20 + ((idx * 23 + 17) % 55)
+
+                recs_json_list.append({
+                    "rank": rec.rank,
+                    "name": rec.name,
+                    "cuisine": f"{rec.cuisine} • {cand_loc}",
+                    "rating": float(rec.rating),
+                    "estimated_cost": int(rec.estimated_cost),
+                    "explanation": rec.explanation,
+                    "dist": f"{(0.6 + idx * 0.4):.1f} km",
+                    "online_order": (cand.online_order if cand and cand.online_order else "No"),
+                    "table_booking": (cand.table_booking if cand and cand.table_booking else "No"),
+                    "votes": (cand.votes if cand and cand.votes else 0),
+                    "coords": {"x": base_x, "y": base_y},
+                })
+
+            recs_json_str = json.dumps(recs_json_list)
+            loc_label = pref_to_run.location
+
+            # Step 7: Render Interactive Split View (Cards on Left + Interactive Map on Right)
+            split_view_html = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+              <style>
+                * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+                body {{
+                  background: transparent;
+                  color: #F8FAFC;
+                  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+                  overflow-x: hidden;
+                }}
+                .split-container {{
+                  display: grid;
+                  grid-template-columns: 1.15fr 0.95fr;
+                  gap: 18px;
+                  align-items: start;
+                  width: 100%;
+                }}
+                @media (max-width: 900px) {{
+                  .split-container {{ grid-template-columns: 1fr; }}
+                }}
+                
+                /* Left Cards Stream */
+                .cards-stream {{
+                  display: flex;
+                  flex-direction: column;
+                  gap: 14px;
+                  max-height: 640px;
+                  overflow-y: auto;
+                  padding-right: 6px;
+                }}
+                .cards-stream::-webkit-scrollbar {{ width: 5px; }}
+                .cards-stream::-webkit-scrollbar-thumb {{ background: #26262F; border-radius: 99px; }}
+
+                .rec-card {{
+                  background: #121215;
+                  border: 1.5px solid rgba(255, 255, 255, 0.08);
+                  border-radius: 16px;
+                  padding: 18px 20px;
+                  transition: all 0.22s ease;
+                  cursor: pointer;
+                  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+                }}
+                .rec-card:hover {{
+                  border-color: rgba(226, 55, 68, 0.45);
+                  background: #17171C;
+                  transform: translateY(-2px);
+                  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 16px rgba(226, 55, 68, 0.15);
+                }}
+                .rec-card.selected {{
+                  border-color: #E23744;
+                  background: #191418;
+                  box-shadow: 0 0 0 1px #E23744, 0 8px 30px rgba(226, 55, 68, 0.22);
+                }}
+                .card-top {{
+                  display: flex;
+                  align-items: flex-start;
+                  justify-content: space-between;
+                  gap: 12px;
+                  margin-bottom: 8px;
+                }}
+                .card-left-meta {{
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  flex: 1;
+                }}
+                .card-rank {{
+                  width: 32px;
+                  height: 32px;
+                  border-radius: 50%;
+                  background: rgba(226, 55, 68, 0.15);
+                  border: 1px solid rgba(226, 55, 68, 0.35);
+                  color: #E23744;
+                  font-size: 12px;
+                  font-weight: 800;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  flex-shrink: 0;
+                }}
+                .card-name {{
+                  font-size: 16px;
+                  font-weight: 800;
+                  color: #FFFFFF;
+                  letter-spacing: -0.3px;
+                }}
+                .badge-map-link {{
+                  background: rgba(226, 55, 68, 0.16);
+                  border: 1px solid rgba(226, 55, 68, 0.35);
+                  color: #FF7B84;
+                  font-size: 9px;
+                  font-weight: 800;
+                  padding: 2px 7px;
+                  border-radius: 99px;
+                  letter-spacing: 0.5px;
+                  text-transform: uppercase;
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 3px;
+                  margin-left: 6px;
+                }}
+                .rating-badge-green {{
+                  background: #22C55E;
+                  color: #FFFFFF;
+                  font-size: 12px;
+                  font-weight: 800;
+                  padding: 3px 8px;
+                  border-radius: 6px;
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 4px;
+                }}
+                .card-subline {{
+                  font-size: 12.5px;
+                  color: #94A3B8;
+                  margin-bottom: 8px;
+                }}
+                .card-meta-row {{
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  flex-wrap: wrap;
+                  font-size: 12px;
+                  color: #94A3B8;
+                  margin-bottom: 10px;
+                }}
+                .cost-highlight {{ color: #FFFFFF; font-weight: 700; }}
+                .tag-chip {{
+                  display: inline-block;
+                  padding: 2px 8px;
+                  background: #181820;
+                  border: 1px solid rgba(255, 255, 255, 0.08);
+                  border-radius: 99px;
+                  color: #94A3B8;
+                  font-size: 10.5px;
+                  font-weight: 600;
+                }}
+                .card-reason-box {{
+                  background: rgba(226, 55, 68, 0.06);
+                  border: 1px solid rgba(226, 55, 68, 0.16);
+                  border-left: 3px solid #E23744;
+                  border-radius: 10px;
+                  padding: 10px 14px;
+                  margin-top: 8px;
+                }}
+                .reason-label {{
+                  font-size: 10px;
+                  font-weight: 800;
+                  color: #E23744;
+                  text-transform: uppercase;
+                  letter-spacing: 0.6px;
+                  margin-bottom: 4px;
+                }}
+                .reason-text {{
+                  font-size: 12px;
+                  color: #F1F5F9;
+                  line-height: 1.5;
+                }}
+
+                /* Right Map Column */
+                .map-column {{
+                  position: sticky;
+                  top: 0;
+                  background: #111115;
+                  border: 1.5px solid rgba(255, 255, 255, 0.08);
+                  border-radius: 18px;
+                  height: 640px;
+                  display: flex;
+                  flex-direction: column;
+                  overflow: hidden;
+                  position: relative;
+                }}
+                .map-header-overlay {{
+                  position: absolute;
+                  top: 14px;
+                  left: 14px;
+                  right: 14px;
+                  z-index: 20;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  pointer-events: none;
+                }}
+                .map-tag-left {{
+                  background: rgba(18, 18, 22, 0.92);
+                  backdrop-filter: blur(8px);
+                  border: 1px solid rgba(255, 255, 255, 0.12);
+                  border-radius: 99px;
+                  padding: 5px 12px;
+                  font-size: 11px;
+                  font-weight: 700;
+                  color: #F8FAFC;
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  pointer-events: auto;
+                }}
+                .tag-red-dot {{
+                  width: 6px;
+                  height: 6px;
+                  border-radius: 50%;
+                  background: #E23744;
+                }}
+                .map-tag-right {{
+                  background: rgba(18, 18, 22, 0.92);
+                  backdrop-filter: blur(8px);
+                  border: 1px solid rgba(255, 255, 255, 0.12);
+                  border-radius: 99px;
+                  padding: 5px 12px;
+                  font-size: 11px;
+                  font-weight: 600;
+                  color: #94A3B8;
+                  pointer-events: auto;
+                }}
+
+                /* Zoom Controls */
+                .map-tools {{
+                  position: absolute;
+                  top: 54px;
+                  right: 14px;
+                  z-index: 20;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 6px;
+                }}
+                .map-tool-btn {{
+                  width: 32px;
+                  height: 32px;
+                  border-radius: 8px;
+                  background: rgba(23, 23, 28, 0.92);
+                  border: 1px solid rgba(255, 255, 255, 0.12);
+                  color: #F8FAFC;
+                  font-size: 14px;
+                  font-weight: 700;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                  transition: all 0.2s;
+                }}
+                .map-tool-btn:hover {{
+                  background: #272732;
+                  border-color: #E23744;
+                }}
+
+                /* SVG Canvas */
+                .map-canvas-wrap {{
+                  flex: 1;
+                  width: 100%;
+                  height: 100%;
+                  position: relative;
+                  background: #0E0E12;
+                  overflow: hidden;
+                }}
+                #mapSvg {{
+                  width: 100%;
+                  height: 100%;
+                  transition: transform 0.3s ease;
+                }}
+
+                /* Dynamic Pins */
+                .map-pin {{
+                  position: absolute;
+                  transform: translate(-50%, -100%);
+                  cursor: pointer;
+                  z-index: 10;
+                  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+                }}
+                .map-pin:hover, .map-pin.active {{
+                  transform: translate(-50%, -105%) scale(1.1);
+                  z-index: 25;
+                }}
+                .pin-bubble {{
+                  background: #1E1E26;
+                  border: 1.5px solid rgba(255, 255, 255, 0.2);
+                  border-radius: 99px;
+                  padding: 4px 10px;
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  font-size: 11px;
+                  font-weight: 700;
+                  color: #FFFFFF;
+                  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+                  white-space: nowrap;
+                }}
+                .map-pin.active .pin-bubble {{
+                  background: #E23744;
+                  border-color: #FF7B84;
+                  box-shadow: 0 0 24px rgba(226, 55, 68, 0.75);
+                }}
+                .pin-rank {{
+                  font-weight: 900;
+                  color: #E23744;
+                }}
+                .map-pin.active .pin-rank {{ color: #FFFFFF; }}
+                .pin-rating {{
+                  background: #22C55E;
+                  color: #FFFFFF;
+                  padding: 1px 5px;
+                  border-radius: 4px;
+                  font-size: 10px;
+                }}
+                .pin-pointer {{
+                  width: 0;
+                  height: 0;
+                  border-left: 5px solid transparent;
+                  border-right: 5px solid transparent;
+                  border-top: 6px solid #1E1E26;
+                  margin: 0 auto;
+                }}
+                .map-pin.active .pin-pointer {{
+                  border-top-color: #E23744;
+                }}
+
+                /* Floating Focused Card on Map Bottom */
+                .map-focus-card {{
+                  position: absolute;
+                  bottom: 14px;
+                  left: 14px;
+                  right: 14px;
+                  z-index: 25;
+                  background: rgba(18, 18, 24, 0.96);
+                  backdrop-filter: blur(14px);
+                  border: 1.5px solid rgba(255, 255, 255, 0.16);
+                  border-radius: 14px;
+                  padding: 14px 16px;
+                  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.7);
+                }}
+                .map-focus-top {{
+                  display: flex;
+                  align-items: flex-start;
+                  justify-content: space-between;
+                  gap: 10px;
+                }}
+                .focus-title {{
+                  font-size: 14px;
+                  font-weight: 800;
+                  color: #FFFFFF;
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                }}
+                .focus-dist {{
+                  background: rgba(34, 197, 94, 0.15);
+                  color: #22C55E;
+                  font-size: 10px;
+                  font-weight: 700;
+                  padding: 1px 6px;
+                  border-radius: 4px;
+                }}
+                .focus-sub {{
+                  font-size: 11px;
+                  color: #94A3B8;
+                  margin-top: 2px;
+                }}
+                .focus-snippet {{
+                  margin-top: 8px;
+                  padding-top: 8px;
+                  border-top: 1px solid rgba(255, 255, 255, 0.08);
+                  font-size: 11px;
+                  color: #CBD5E1;
+                  line-height: 1.5;
+                  display: -webkit-box;
+                  -webkit-line-clamp: 2;
+                  -webkit-box-orient: vertical;
+                  overflow: hidden;
+                }}
+                .map-action-row {{
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  margin-top: 10px;
+                }}
+                .btn-action-red {{
+                  background: #E23744;
+                  color: #FFFFFF;
+                  font-size: 11px;
+                  font-weight: 700;
+                  border-radius: 99px;
+                  padding: 6px 14px;
+                  border: none;
+                  cursor: pointer;
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 4px;
+                  text-decoration: none;
+                }}
+                .btn-action-red:hover {{ background: #FF3B4B; }}
+                .btn-action-dark {{
+                  background: #24242F;
+                  border: 1px solid rgba(255, 255, 255, 0.12);
+                  color: #94A3B8;
+                  font-size: 11px;
+                  font-weight: 600;
+                  border-radius: 99px;
+                  padding: 6px 14px;
+                  border: none;
+                  cursor: pointer;
+                }}
+                .btn-action-dark:hover {{ color: #FFFFFF; background: #2E2E3A; }}
+              </style>
+            </head>
+            <body>
+              <div class="split-container">
+                <!-- Left: Cards Stream -->
+                <div class="cards-stream" id="cardsStream"></div>
+
+                <!-- Right: Interactive Styled Map Widget -->
+                <div class="map-column" id="mapColumn">
+                  <!-- Header Overlay -->
+                  <div class="map-header-overlay">
+                    <div class="map-tag-left">
+                      <span class="tag-red-dot"></span>
+                      <span id="mapCounter">Showing {len(recommendations)} Recommendations</span>
+                    </div>
+                    <div class="map-tag-right">📍 {loc_label}</div>
+                  </div>
+
+                  <!-- Zoom Tools -->
+                  <div class="map-tools">
+                    <button type="button" class="map-tool-btn" id="mapZoomIn" title="Zoom in">+</button>
+                    <button type="button" class="map-tool-btn" id="mapZoomOut" title="Zoom out">&minus;</button>
+                    <button type="button" class="map-tool-btn" id="mapRecenter" title="Recenter location">⌖</button>
+                  </div>
+
+                  <!-- SVG Dark Map Canvas -->
+                  <div class="map-canvas-wrap" id="mapCanvasWrap">
+                    <svg id="mapSvg" viewBox="0 0 800 900" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="roadGlow" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stop-color="#22222E" />
+                          <stop offset="100%" stop-color="#2E2E3E" />
+                        </linearGradient>
+                        <filter id="glowFilter">
+                          <feGaussianBlur stdDeviation="3" result="blur" />
+                          <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                          </feMerge>
+                        </filter>
+                      </defs>
+
+                      <!-- Dark Ground -->
+                      <rect width="800" height="900" fill="#0C0D11" />
+
+                      <!-- Regional Park -->
+                      <path d="M 520,380 Q 640,340 760,420 L 800,560 L 580,580 Z" fill="#101815" stroke="#14261F" stroke-width="1.5" />
+                      <text x="630" y="460" fill="#2E4C3E" font-size="11" font-weight="800" letter-spacing="1">REGIONAL PARK</text>
+
+                      <!-- Neighborhood Labels -->
+                      <text x="60" y="740" fill="#2E2E3A" font-size="15" font-weight="900" letter-spacing="2">KORAMANGALA</text>
+                      <text x="440" y="160" fill="#2E2E3A" font-size="15" font-weight="900" letter-spacing="2">INDIRANAGAR</text>
+                      <text x="120" y="240" fill="#2E2E3A" font-size="15" font-weight="900" letter-spacing="2">{loc_label.upper()}</text>
+
+                      <!-- Secondary Roads Grid -->
+                      <g stroke="url(#roadGlow)" stroke-width="2" stroke-linecap="round" opacity="0.6">
+                        <line x1="40" y1="120" x2="760" y2="120" />
+                        <line x1="40" y1="280" x2="760" y2="280" />
+                        <line x1="40" y1="440" x2="760" y2="440" />
+                        <line x1="40" y1="620" x2="760" y2="620" />
+                        <line x1="40" y1="780" x2="760" y2="780" />
+                        <line x1="160" y1="40" x2="160" y2="860" />
+                        <line x1="320" y1="40" x2="320" y2="860" />
+                        <line x1="480" y1="40" x2="480" y2="860" />
+                        <line x1="660" y1="40" x2="660" y2="860" />
+                      </g>
+
+                      <!-- Major Arteries -->
+                      <g stroke="#3D2028" stroke-width="7" stroke-linecap="round" opacity="0.75">
+                        <path d="M 60,820 C 220,680 380,500 520,240 S 720,100 780,80" fill="none" />
+                        <path d="M 80,180 C 240,260 480,480 720,740" fill="none" />
+                      </g>
+                      <g stroke="#E23744" stroke-width="2" stroke-linecap="round" opacity="0.45" filter="url(#glowFilter)">
+                        <path d="M 60,820 C 220,680 380,500 520,240 S 720,100 780,80" fill="none" />
+                      </g>
+                    </svg>
+
+                    <!-- Dynamic Interactive HTML Pins -->
+                    <div id="mapPinsLayer"></div>
+
+                    <!-- Floating Focused Card on Map Bottom -->
+                    <div class="map-focus-card" id="mapFocusCard">
+                      <div class="map-focus-top">
+                        <div>
+                          <div class="focus-title">
+                            <span id="focusRank" style="color:#E23744; font-weight:900">#1</span>
+                            <span id="focusName">Restaurant</span>
+                            <span class="focus-dist" id="focusDist">0.8 km</span>
+                          </div>
+                          <div class="focus-sub" id="focusSub">Cuisine • Location</div>
+                        </div>
+                        <div style="text-align:right">
+                          <span class="rating-badge-green" id="focusRating">4.4 ★</span>
+                          <div style="font-size:11px; color:#94A3B8; margin-top:2px" id="focusCost">₹480 for two</div>
+                        </div>
+                      </div>
+                      <div class="focus-snippet" id="focusSnippet">"AI Recommendation quote"</div>
+                      <div class="map-action-row">
+                        <a id="btnDirections" class="btn-action-red" href="#" target="_blank">↗ Directions</a>
+                        <button type="button" class="btn-action-dark" onclick="window.scrollTo({{top:0, behavior:'smooth'}})">↑ Top</button>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <script>
+                const recs = {recs_json_str};
+                let selectedIdx = 0;
+                let currentZoom = 1;
+
+                const cardsStream = document.getElementById('cardsStream');
+                const mapPinsLayer = document.getElementById('mapPinsLayer');
+                const mapSvg = document.getElementById('mapSvg');
+
+                function escapeHtml(str) {{
+                  if (!str) return '';
+                  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                }}
+
+                function render() {{
+                  cardsStream.innerHTML = '';
+                  mapPinsLayer.innerHTML = '';
+
+                  recs.forEach((item, idx) => {{
+                    // 1. Build List Card
+                    const card = document.createElement('div');
+                    card.className = `rec-card ${{idx === selectedIdx ? 'selected' : ''}}`;
+                    card.setAttribute('data-index', idx);
+                    
+                    let chipsHtml = '';
+                    if (item.online_order && item.online_order.toLowerCase() === 'yes') chipsHtml += '<span class="tag-chip">🛵 Online Delivery</span>';
+                    if (item.table_booking && item.table_booking.toLowerCase() === 'yes') chipsHtml += '<span class="tag-chip">📅 Table Booking</span>';
+                    if (item.votes) chipsHtml += `<span class="tag-chip">🗳️ ${{item.votes.toLocaleString()}} votes</span>`;
+
+                    card.innerHTML = `
+                      <div class="card-top">
+                        <div class="card-left-meta">
+                          <div class="card-rank">#${{item.rank}}</div>
+                          <div>
+                            <span class="card-name">${{escapeHtml(item.name)}}</span>
+                            ${{idx === selectedIdx ? '<span class="badge-map-link">↑ LINKED TO MAP</span>' : ''}}
+                            <div class="card-subline">🍲 ${{escapeHtml(item.cuisine)}}</div>
+                          </div>
+                        </div>
+                        <span class="rating-badge-green">★ ${{Number(item.rating).toFixed(1)}}</span>
+                      </div>
+                      <div class="card-meta-row">
+                        <span>Approx. Cost for Two: <span class="cost-highlight">₹${{item.estimated_cost.toLocaleString()}}</span></span>
+                        ${{chipsHtml}}
+                      </div>
+                      <div class="card-reason-box">
+                        <div class="reason-label">✦ WHY THIS MATCHES YOUR CRAVING</div>
+                        <div class="reason-text">${{escapeHtml(item.explanation)}}</div>
+                      </div>
+                    `;
+
+                    card.addEventListener('click', () => selectIndex(idx));
+                    cardsStream.appendChild(card);
+
+                    // 2. Build Map Pin
+                    const xPos = item.coords.x;
+                    const yPos = item.coords.y;
+
+                    const pin = document.createElement('div');
+                    pin.className = `map-pin ${{idx === selectedIdx ? 'active' : ''}}`;
+                    pin.style.left = `${{xPos}}%`;
+                    pin.style.top = `${{yPos}}%`;
+                    pin.setAttribute('data-index', idx);
+                    pin.innerHTML = `
+                      <div class="pin-bubble">
+                        <span class="pin-rank">#${{item.rank}}</span>
+                        <span>${{escapeHtml(item.name)}}</span>
+                        <span class="pin-rating">★ ${{Number(item.rating).toFixed(1)}}</span>
+                      </div>
+                      <div class="pin-pointer"></div>
+                    `;
+
+                    pin.addEventListener('click', (e) => {{
+                      e.stopPropagation();
+                      selectIndex(idx);
+                    }});
+                    mapPinsLayer.appendChild(pin);
+                  }});
+
+                  updateFocus(recs[selectedIdx]);
+                }}
+
+                function selectIndex(idx) {{
+                  selectedIdx = idx;
+                  const target = recs[idx];
+                  if (!target) return;
+
+                  // Update Cards
+                  document.querySelectorAll('.rec-card').forEach((c, i) => {{
+                    if (i === idx) {{
+                      c.classList.add('selected');
+                      if (!c.querySelector('.badge-map-link')) {{
+                        const nameBox = c.querySelector('.card-name');
+                        const b = document.createElement('span');
+                        b.className = 'badge-map-link';
+                        b.innerText = '↑ LINKED TO MAP';
+                        nameBox.after(b);
+                      }}
+                      c.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
+                    }} else {{
+                      c.classList.remove('selected');
+                      const b = c.querySelector('.badge-map-link');
+                      if (b) b.remove();
+                    }}
+                  }});
+
+                  // Update Pins
+                  document.querySelectorAll('.map-pin').forEach((p, i) => {{
+                    if (i === idx) p.classList.add('active');
+                    else p.classList.remove('active');
+                  }});
+
+                  updateFocus(target);
+                }}
+
+                function updateFocus(item) {{
+                  if (!item) return;
+                  document.getElementById('focusRank').innerText = `#${{item.rank}}`;
+                  document.getElementById('focusName').innerText = item.name;
+                  document.getElementById('focusDist').innerText = item.dist;
+                  document.getElementById('focusSub').innerText = item.cuisine;
+                  document.getElementById('focusRating').innerText = `${{Number(item.rating).toFixed(1)}} ★`;
+                  document.getElementById('focusCost').innerText = `₹${{item.estimated_cost.toLocaleString()}} for two`;
+                  document.getElementById('focusSnippet').innerText = `"${{item.explanation}}"`;
+                  
+                  const dirBtn = document.getElementById('btnDirections');
+                  dirBtn.href = `https://www.google.com/maps/search/?api=1&query=${{encodeURIComponent(item.name + ' ' + item.cuisine)}}`;
+                }}
+
+                // Zoom Tools
+                document.getElementById('mapZoomIn').addEventListener('click', () => {{
+                  currentZoom = Math.min(1.8, currentZoom + 0.2);
+                  mapSvg.style.transform = `scale(${{currentZoom}})`;
+                  mapPinsLayer.style.transform = `scale(${{currentZoom}})`;
+                }});
+                document.getElementById('mapZoomOut').addEventListener('click', () => {{
+                  currentZoom = Math.max(0.8, currentZoom - 0.2);
+                  mapSvg.style.transform = `scale(${{currentZoom}})`;
+                  mapPinsLayer.style.transform = `scale(${{currentZoom}})`;
+                }});
+                document.getElementById('mapRecenter').addEventListener('click', () => {{
+                  currentZoom = 1;
+                  mapSvg.style.transform = 'scale(1)';
+                  mapPinsLayer.style.transform = 'scale(1)';
+                }});
+
+                render();
+              </script>
+            </body>
+            </html>
+            """
+
             st.markdown(
                 f"#### 🍽️ Top Recommendations ({len(recommendations)} curated from {len(candidates)} candidates)"
             )
+            components.html(split_view_html, height=660, scrolling=False)
 
-            # Step 7: Render Cards matching .rec-card from ui/index.html
-            for rec in recommendations:
-                cand = next((c for c in candidates if c.id == rec.id), None)
-
-                # Cost tier formatting
-                if rec.estimated_cost <= repo.p33_cost:
-                    cost_tier_badge = "Budget (₹)"
-                elif rec.estimated_cost <= repo.p66_cost:
-                    cost_tier_badge = "Mid-range (₹₹)"
-                else:
-                    cost_tier_badge = "Fine Dining (₹₹₹)"
-
-                # Additional catalog chips
-                chips_html = ""
-                if cand:
-                    if cand.online_order and cand.online_order.lower() == "yes":
-                        chips_html += '<span class="tag-chip">🛵 Online Delivery</span>'
-                    if cand.table_booking and cand.table_booking.lower() == "yes":
-                        chips_html += '<span class="tag-chip">📅 Table Booking</span>'
-                    if cand.votes:
-                        chips_html += f'<span class="tag-chip">🗳️ {cand.votes:,} votes</span>'
-
-                cand_location = cand.location if cand else pref_to_run.location
-
-                st.markdown(
-                    f"""
-                    <div class="rec-card">
-                        <div class="card-top">
-                            <div class="card-left-meta">
-                                <div class="card-rank">#{rec.rank}</div>
-                                <div>
-                                    <h3 class="card-name">{rec.name}</h3>
-                                    <div class="card-subline">🍲 {rec.cuisine} &nbsp;•&nbsp; 📍 {cand_location}</div>
-                                </div>
-                            </div>
-                            <div>
-                                <span class="rating-badge-green">★ {rec.rating:.1f}</span>
-                            </div>
-                        </div>
-                        <div class="card-meta-row">
-                            <span>Approx. Cost for Two: <span class="cost-highlight">₹{int(rec.estimated_cost):,}</span></span>
-                            <span class="tag-chip">{cost_tier_badge}</span>
-                            {chips_html}
-                        </div>
-                        <div class="card-reason-box">
-                            <div class="reason-label">✦ WHY THIS MATCHES YOUR CRAVING</div>
-                            <div class="reason-text">{rec.explanation}</div>
-                        </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
 else:
     st.info("👈 **Select your dining preferences in the sidebar and tap 'Get Recommendations' to start!**")
