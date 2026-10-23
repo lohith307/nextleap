@@ -1,6 +1,7 @@
 """
 Zomato AI Restaurant Recommendation System - Streamlit Web Application
 Combines structured catalog retrieval with grounded LLM reasoning for personalized recommendations.
+Replicates the ultra-premium dark-mode design system from ui/index.html.
 """
 import os
 import streamlit as st
@@ -13,167 +14,378 @@ from llm.client import LLMClient
 # Page Configuration
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="Zomato AI - Restaurant Recommender",
+    page_title="ZomatoAI — AI-Powered Restaurant Discovery",
     page_icon="🍽️",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 # ---------------------------------------------------------
-# Custom Styling (Zomato Red Theme & Clean Card Layout)
+# Custom Styling (Matches ui/index.html Dark Theme Exactly)
 # ---------------------------------------------------------
 st.markdown(
     """
     <style>
-    /* Global accents */
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
     :root {
-        --zomato-red: #E23744;
-        --zomato-dark: #1C1C1C;
-        --zomato-light-gray: #F8F9FA;
-        --zomato-green: #24963F;
-    }
-    
-    /* Header typography */
-    .hero-title {
-        color: #E23744;
-        font-size: 2.3rem;
-        font-weight: 800;
-        margin-bottom: 0.2rem;
-        letter-spacing: -0.5px;
-    }
-    .hero-subtitle {
-        color: #555555;
-        font-size: 1.05rem;
-        margin-bottom: 1.5rem;
-    }
-
-    /* Engine status pill */
-    .engine-pill {
-        display: inline-block;
-        padding: 4px 12px;
-        background-color: #FEECEE;
-        color: #E23744;
-        border: 1px solid #FCD4D7;
-        border-radius: 16px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
+      --bg:             #09090B;
+      --bg-panel:       #121215;
+      --bg-card:        #17171C;
+      --bg-card-hover:  #1D1D23;
+      --bg-input:       #19191F;
+      --border-subtle:  rgba(255, 255, 255, 0.08);
+      --border-strong:  rgba(255, 255, 255, 0.16);
+      --brand:          #E23744;
+      --brand-hover:    #FF3B4B;
+      --brand-glow:     rgba(226, 55, 68, 0.35);
+      --brand-tint:     rgba(226, 55, 68, 0.12);
+      --ai-purple:      #A855F7;
+      --ai-purple-tint: rgba(168, 85, 247, 0.12);
+      --ai-purple-border: rgba(168, 85, 247, 0.32);
+      --rating-green:   #22C55E;
+      --rating-green-bg:rgba(34, 197, 94, 0.16);
+      --text-1:         #F8FAFC;
+      --text-2:         #94A3B8;
+      --text-3:         #64748B;
+      --radius-sm:      8px;
+      --radius-md:      12px;
+      --radius-lg:      18px;
+      --font:           'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* Summary Card */
-    .summary-card {
-        background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
-        border: 1px solid #FCD4D7;
-        border-left: 5px solid #E23744;
-        border-radius: 8px;
-        padding: 16px 20px;
-        margin-bottom: 24px;
-        box-shadow: 0 2px 6px rgba(226, 55, 68, 0.06);
-    }
-    .summary-title {
-        color: #E23744;
-        font-weight: 700;
-        font-size: 1.05rem;
-        margin-bottom: 6px;
-    }
-    .summary-body {
-        color: #2D2D2D;
-        font-size: 0.96rem;
-        line-height: 1.5;
+    /* Global Streamlit Reset to Dark Palette */
+    .stApp {
+        background-color: var(--bg) !important;
+        font-family: var(--font) !important;
+        color: var(--text-1) !important;
     }
 
-    /* Restaurant Card */
-    .restaurant-card {
-        background-color: #FFFFFF;
-        border: 1px solid #EBEBEB;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 18px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .restaurant-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-        border-color: #E23744;
+    [data-testid="stSidebar"] {
+        background-color: var(--bg-panel) !important;
+        border-right: 1px solid var(--border-subtle) !important;
     }
 
-    /* Card Elements */
-    .card-header-row {
+    [data-testid="stSidebar"] * {
+        font-family: var(--font) !important;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #26262F; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #383844; }
+
+    /* Top Brand Navigation */
+    .nav-bar {
+        background: rgba(9, 9, 11, 0.92);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 12px 20px;
+        margin-bottom: 20px;
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 8px;
     }
-    .restaurant-name {
-        color: #1C1C1C;
-        font-size: 1.35rem;
-        font-weight: 700;
-        margin: 0;
+    .nav-logo {
+        font-size: 24px;
+        font-weight: 900;
+        color: var(--brand);
+        letter-spacing: -0.6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
-    .rank-badge {
-        background-color: #E23744;
-        color: #FFFFFF;
-        font-weight: 700;
-        padding: 2px 9px;
-        border-radius: 12px;
-        font-size: 0.82rem;
+    .nav-ai-pill {
+        background: rgba(226, 55, 68, 0.14);
+        border: 1px solid rgba(226, 55, 68, 0.35);
+        border-radius: 99px;
+        padding: 2px 10px;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--brand);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
     }
-    .rating-badge {
+    .nav-status {
         display: inline-flex;
         align-items: center;
-        background-color: #24963F;
-        color: #FFFFFF;
-        font-weight: 700;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 0.9rem;
-    }
-    .rating-badge-high { background-color: #24963F; }
-    .rating-badge-mid  { background-color: #E58E26; }
-    .rating-badge-low  { background-color: #757575; }
-
-    .cuisine-text {
-        color: #555555;
-        font-size: 0.95rem;
-        margin-bottom: 6px;
-    }
-    .cost-text {
-        color: #1C1C1C;
+        gap: 7px;
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.28);
+        border-radius: 99px;
+        padding: 4px 14px;
+        font-size: 12px;
         font-weight: 600;
-        font-size: 0.95rem;
+        color: var(--rating-green);
+    }
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--rating-green);
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+        animation: pulse-dot 2s infinite ease-in-out;
+    }
+    @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+        text-align: center;
+        padding: 40px 20px 30px;
+        background: radial-gradient(circle at 50% -20%, #2b0207 0%, #170005 45%, var(--bg) 85%);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        margin-bottom: 24px;
+    }
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(226, 55, 68, 0.1);
+        border: 1px solid rgba(226, 55, 68, 0.3);
+        border-radius: 99px;
+        padding: 4px 14px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #FFA5AB;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
         margin-bottom: 12px;
     }
-    .explanation-box {
-        background-color: #F8F9FA;
-        border-left: 3px solid #4A90E2;
-        border-radius: 4px;
-        padding: 10px 14px;
-        margin-top: 10px;
-        font-size: 0.92rem;
-        color: #333333;
-        line-height: 1.45;
+    .hero-title {
+        font-size: 2.3rem;
+        font-weight: 800;
+        letter-spacing: -0.8px;
+        color: #FFFFFF;
+        margin-bottom: 8px;
+    }
+    .gradient-text {
+        background: linear-gradient(135deg, #FF4B5C 0%, #FF8591 45%, #FFAAA6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+        font-size: 14.5px;
+        color: var(--text-2);
+        max-width: 600px;
+        margin: 0 auto 18px;
+        line-height: 1.6;
+    }
+    .hero-badges {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #15151A;
+        border: 1px solid var(--border-subtle);
+        border-radius: 99px;
+        padding: 5px 14px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--text-2);
+    }
+
+    /* AI Overview Box */
+    .ai-overview-box {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(226, 55, 68, 0.08) 100%);
+        border: 1px solid var(--ai-purple-border);
+        border-radius: var(--radius-lg);
+        padding: 18px 22px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 20px rgba(168, 85, 247, 0.08);
+    }
+    .ai-icon-box {
+        width: 38px;
+        height: 38px;
+        border-radius: var(--radius-sm);
+        background: var(--ai-purple-tint);
+        border: 1px solid var(--ai-purple-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+    .ai-overview-label {
+        font-size: 10.5px;
+        font-weight: 800;
+        color: var(--ai-purple);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 4px;
+    }
+    .ai-overview-text {
+        font-size: 13.5px;
+        color: #E2E8F0;
+        line-height: 1.6;
+    }
+
+    /* Recommendation Cards */
+    .rec-card {
+        background: var(--bg-panel);
+        border: 1.5px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 20px 22px;
+        margin-bottom: 16px;
+        transition: all 0.22s ease;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+    }
+    .rec-card:hover {
+        border-color: rgba(226, 55, 68, 0.45);
+        background: var(--bg-card);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 16px rgba(226, 55, 68, 0.15);
+    }
+    .card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 8px;
+    }
+    .card-left-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .card-rank {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(226, 55, 68, 0.15);
+        border: 1px solid rgba(226, 55, 68, 0.35);
+        color: var(--brand);
+        font-size: 13px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .card-name {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #FFFFFF;
+        letter-spacing: -0.3px;
+        margin: 0;
+    }
+    .rating-badge-green {
+        background: var(--rating-green);
+        color: #FFFFFF;
+        font-size: 12.5px;
+        font-weight: 800;
+        padding: 3px 9px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    }
+    .card-subline {
+        font-size: 13px;
+        color: var(--text-2);
+        margin-bottom: 10px;
+    }
+    .card-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        font-size: 12.5px;
+        color: var(--text-2);
+        margin-bottom: 12px;
+    }
+    .cost-highlight {
+        color: #FFFFFF;
+        font-weight: 700;
     }
     .tag-chip {
         display: inline-block;
-        padding: 2px 8px;
-        background-color: #F1F2F6;
-        color: #475569;
-        border-radius: 4px;
-        font-size: 0.78rem;
-        margin-right: 6px;
-        margin-top: 4px;
+        padding: 3px 9px;
+        background: #181820;
+        border: 1px solid var(--border-subtle);
+        border-radius: 99px;
+        color: var(--text-2);
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .card-reason-box {
+        background: rgba(226, 55, 68, 0.06);
+        border: 1px solid rgba(226, 55, 68, 0.16);
+        border-left: 3px solid var(--brand);
+        border-radius: var(--radius-md);
+        padding: 12px 16px;
+        margin-top: 10px;
+    }
+    .reason-label {
+        font-size: 10.5px;
+        font-weight: 800;
+        color: var(--brand);
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 5px;
+    }
+    .reason-text {
+        font-size: 12.8px;
+        color: #F1F5F9;
+        line-height: 1.5;
+    }
+
+    /* Streamlit Widget Styles */
+    .stButton > button {
+        background: linear-gradient(135deg, #E23744 0%, #C02734 100%) !important;
+        color: #FFFFFF !important;
+        font-weight: 800 !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 12px 20px !important;
+        font-size: 14px !important;
+        letter-spacing: 0.3px !important;
+        box-shadow: 0 4px 20px var(--brand-glow) !important;
+        transition: all 0.22s ease !important;
+    }
+    .stButton > button:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 26px rgba(226, 55, 68, 0.55) !important;
+    }
+
+    div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {
+        background-color: var(--bg-input) !important;
+        border: 1px solid var(--border-subtle) !important;
+        border-radius: 10px !important;
+        color: var(--text-1) !important;
+    }
+    div[data-baseweb="select"] > div:focus-within, div[data-baseweb="input"] > div:focus-within {
+        border-color: var(--brand) !important;
+        box-shadow: 0 0 0 2px var(--brand-glow) !important;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-
 # ---------------------------------------------------------
 # Cached Service Initialization (Single memory instance)
 # ---------------------------------------------------------
-@st.cache_resource(show_spinner="Loading Zomato catalog and initializing AI engine...")
+@st.cache_resource(show_spinner="Loading verified Zomato catalog and initializing AI engine...")
 def load_app_services():
     """Initializes and caches the catalog repository, candidate filter, and LLM client."""
     repo = RestaurantRepo()
@@ -196,10 +408,53 @@ else:
 
 
 # ---------------------------------------------------------
+# Top Navigation Bar (Matches ui/index.html)
+# ---------------------------------------------------------
+st.markdown(
+    f"""
+    <div class="nav-bar">
+        <div class="nav-logo">
+            <span>zomato</span><span class="nav-ai-pill">AI</span>
+        </div>
+        <div class="nav-status">
+            <span class="status-dot"></span>
+            <span>{len(repo.restaurants):,} Verified Catalog Restaurants • {active_engine}</span>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# ---------------------------------------------------------
+# Hero Banner (Matches ui/index.html)
+# ---------------------------------------------------------
+st.markdown(
+    f"""
+    <div class="hero-banner">
+        <div class="hero-eyebrow">✦ NEXT-GEN RESTAURANT DISCOVERY</div>
+        <h1 class="hero-title">Find Your Next Craving with <span class="gradient-text">AI-Powered Reasoning</span></h1>
+        <p class="hero-subtitle">
+            Structured catalog filtering meets LLM intelligence. Every recommendation is fact-verified against
+            real catalog ratings, costs, and locations with personalized reasoning.
+        </p>
+        <div class="hero-badges">
+            <span class="hero-badge">⚡ {active_engine}</span>
+            <span class="hero-badge">🔒 100% Zero-Hallucination Grounding</span>
+            <span class="hero-badge">📍 {len(repo.get_locations())} Bengaluru Localities</span>
+            <span class="hero-badge">🍲 {len(repo.get_cuisines())} Cuisines</span>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# ---------------------------------------------------------
 # Sidebar: User Preference Inputs
 # ---------------------------------------------------------
 with st.sidebar:
-    st.markdown("## 🔍 **Search & Filters**")
+    st.markdown("### 🔍 **Filter & Preferences**")
 
     # 1. Location
     locations = repo.get_locations()
@@ -225,7 +480,7 @@ with st.sidebar:
             break
 
     selected_cuisine = st.selectbox(
-        "🍳 **Cuisine**",
+        "🍳 **Target Cuisine**",
         options=cuisines,
         index=default_cui_idx,
         help="Target cuisine style to discover.",
@@ -238,7 +493,7 @@ with st.sidebar:
         f"Fine Dining (Above ₹{int(repo.p66_cost)})": BudgetBand.HIGH,
     }
     budget_choice = st.radio(
-        "💰 **Budget Tier**",
+        "💰 **Budget Band**",
         options=list(budget_options.keys()),
         index=1,
         help="Categorized based on catalog percentiles (p33 & p66).",
@@ -260,60 +515,40 @@ with st.sidebar:
         "🥗 **Dietary Preference**",
         options=["Any", "Vegetarian / Pure Veg", "Non-Veg Friendly"],
         index=0,
-        help="Filter and emphasize vegetarian or non-vegetarian options.",
     )
 
     # 6. Ambiance & Occasion
     ambiance_tags = st.multiselect(
-        "✨ **Ambiance / Occasion**",
+        "✨ **Ambiance / Vibe**",
         options=[
-            "Family Friendly",
-            "Romantic / Date Night",
-            "Quick Bite & Fast Service",
-            "Rooftop & Outdoor Seating",
+            "Family Dining",
+            "Romantic Date Night",
+            "Rooftop & Outdoor",
             "Cozy Cafe Vibes",
             "Late Night Food",
-            "Live Music & Drinks",
+            "Quick Bite & Fast Service",
+            "Live Music & Cocktails",
         ],
-        default=[],
-        help="Select desired vibes or occasions for LLM personalization.",
+        default=["Family Dining"],
+        help="Select desired vibes for LLM personalization.",
     )
 
     # 7. Additional Free-text Notes
     additional_notes = st.text_input(
-        "📝 **Custom Notes** (Optional)",
+        "📝 **Custom Cravings / Notes**",
         value="",
-        placeholder="e.g. authentic biryani, good desserts, quiet corner",
-        help="Additional custom requirements passed to the AI reasoning engine.",
+        placeholder="e.g. authentic biryani, quiet corner, great desserts",
     )
 
     st.markdown("---")
-    search_submitted = st.button("🚀 **Get AI Recommendations**", use_container_width=True, type="primary")
-
-    # Sidebar Catalog Stats & Engine Info
-    st.markdown("### 📊 **Catalog Metadata**")
-    st.caption(f"**Verified Restaurants:** {len(repo.restaurants):,}")
-    st.caption(f"**Distinct Locations:** {len(locations)}")
-    st.caption(f"**Distinct Cuisines:** {len(cuisines)}")
-    st.caption(f"**Active Reasoning:** {active_engine}")
-
-
-# ---------------------------------------------------------
-# Hero Banner
-# ---------------------------------------------------------
-st.markdown('<div class="hero-title">🍽️ Zomato AI Restaurant Recommender</div>', unsafe_allow_html=True)
-st.markdown(
-    '<div class="hero-subtitle">Combines structured catalog retrieval with LLM reasoning for verified, fact-grounded dining suggestions.</div>',
-    unsafe_allow_html=True,
-)
-st.markdown(f'<span class="engine-pill">⚡ Powered by {active_engine}</span>', unsafe_allow_html=True)
+    search_submitted = st.button("🚀 Find Recommendations", use_container_width=True)
 
 
 # ---------------------------------------------------------
 # Quick Preset Inspiration (1-Click)
 # ---------------------------------------------------------
 if not search_submitted and "preset_pref" not in st.session_state:
-    st.markdown("##### 💡 Or try a popular discovery prompt:")
+    st.markdown("##### 💡 Or tap a curated discovery shortcut:")
     col_p1, col_p2, col_p3 = st.columns(3)
 
     if col_p1.button("🍛 North Indian in Banashankari (Mid-Range)"):
@@ -322,27 +557,27 @@ if not search_submitted and "preset_pref" not in st.session_state:
             cuisine="North Indian",
             budget=BudgetBand.MEDIUM,
             min_rating=3.8,
-            additional_preferences="family friendly, flavorful curry",
+            additional_preferences="family friendly, flavorful curries and naan",
         )
         st.rerun()
 
-    if col_p2.button("☕ Cafe Vibes in Bangalore (Budget)"):
+    if col_p2.button("☕ Cozy Cafe in Bangalore (Budget)"):
         st.session_state["preset_pref"] = UserPreference(
             location="Bangalore",
             cuisine="Cafe",
             budget=BudgetBand.LOW,
             min_rating=3.5,
-            additional_preferences="cozy ambiance, quick coffee and snacks",
+            additional_preferences="cozy cafe vibes, great coffee and snacks",
         )
         st.rerun()
 
-    if col_p3.button("🍕 Italian in Koramangala (Fine Dining)"):
+    if col_p3.button("🍕 Fine Dining Italian in Koramangala"):
         st.session_state["preset_pref"] = UserPreference(
             location="Bangalore",
             cuisine="Italian",
             budget=BudgetBand.HIGH,
             min_rating=4.0,
-            additional_preferences="authentic pasta, premium date night",
+            additional_preferences="authentic wood-fired pizza and pasta, romantic date",
         )
         st.rerun()
 
@@ -352,7 +587,6 @@ if not search_submitted and "preset_pref" not in st.session_state:
 # ---------------------------------------------------------
 pref_to_run = None
 if search_submitted:
-    # Combine dietary preference, ambiance tags, and custom notes
     extra_prefs = []
     if dietary_preference and dietary_preference != "Any":
         extra_prefs.append(dietary_preference)
@@ -374,7 +608,7 @@ elif "preset_pref" in st.session_state:
     pref_to_run = st.session_state.pop("preset_pref")
 
 if pref_to_run:
-    with st.spinner("Finding best matching restaurants and generating AI recommendations..."):
+    with st.spinner("Analyzing verified catalog & synthesizing AI explanations with Groq..."):
         # Step 1: Catalog Filtering
         candidates, is_relaxed = filter_engine.extract_candidates(pref_to_run, limit=15)
 
@@ -399,34 +633,29 @@ if pref_to_run:
                     f"in **{pref_to_run.location}**."
                 )
 
-            # Step 5: AI Contextual Summary Banner
+            # Step 5: AI Contextual Summary Banner (Matches ui/index.html)
             if summary:
                 st.markdown(
                     f"""
-                    <div class="summary-card">
-                        <div class="summary-title">🤖 AI Recommendation Summary</div>
-                        <div class="summary-body">{summary}</div>
+                    <div class="ai-overview-box">
+                        <div class="ai-icon-box">✦</div>
+                        <div class="ai-overview-content">
+                            <div class="ai-overview-label">AI CURATION OVERVIEW • {active_engine}</div>
+                            <div class="ai-overview-text">{summary}</div>
+                        </div>
                     </div>
                     """,
                     unsafe_allow_html=True,
                 )
 
-            # Step 6: Render Recommendations
+            # Step 6: Render Recommendations Header
             st.markdown(
-                f"### 🍽️ Top Recommendations ({len(recommendations)} found out of {len(candidates)} verified candidates)"
+                f"#### 🍽️ Top Recommendations ({len(recommendations)} curated from {len(candidates)} candidates)"
             )
 
+            # Step 7: Render Cards matching .rec-card from ui/index.html
             for rec in recommendations:
-                # Find candidate metadata for additional tags
                 cand = next((c for c in candidates if c.id == rec.id), None)
-
-                # Determine rating badge color
-                if rec.rating >= 4.0:
-                    badge_class = "rating-badge rating-badge-high"
-                elif rec.rating >= 3.5:
-                    badge_class = "rating-badge rating-badge-mid"
-                else:
-                    badge_class = "rating-badge rating-badge-low"
 
                 # Cost tier formatting
                 if rec.estimated_cost <= repo.p33_cost:
@@ -446,27 +675,35 @@ if pref_to_run:
                     if cand.votes:
                         chips_html += f'<span class="tag-chip">🗳️ {cand.votes:,} votes</span>'
 
+                cand_location = cand.location if cand else pref_to_run.location
+
                 st.markdown(
                     f"""
-                    <div class="restaurant-card">
-                        <div class="card-header-row">
-                            <div>
-                                <span class="rank-badge">#{rec.rank}</span>
-                                <h3 class="restaurant-name" style="display:inline-block; margin-left: 8px;">{rec.name}</h3>
+                    <div class="rec-card">
+                        <div class="card-top">
+                            <div class="card-left-meta">
+                                <div class="card-rank">#{rec.rank}</div>
+                                <div>
+                                    <h3 class="card-name">{rec.name}</h3>
+                                    <div class="card-subline">🍲 {rec.cuisine} &nbsp;•&nbsp; 📍 {cand_location}</div>
+                                </div>
                             </div>
-                            <div class="{badge_class}">
-                                ★ {rec.rating:.1f}
+                            <div>
+                                <span class="rating-badge-green">★ {rec.rating:.1f}</span>
                             </div>
                         </div>
-                        <div class="cuisine-text">🍲 <strong>Cuisine:</strong> {rec.cuisine} &nbsp;•&nbsp; 📍 <strong>Location:</strong> {cand.location if cand else pref_to_run.location}</div>
-                        <div class="cost-text">💰 <strong>Approx. Cost for two:</strong> ₹{int(rec.estimated_cost):,} &nbsp;<span class="tag-chip">{cost_tier_badge}</span> {chips_html}</div>
-                        <div class="explanation-box">
-                            💡 <strong>Why this was recommended:</strong> {rec.explanation}
+                        <div class="card-meta-row">
+                            <span>Approx. Cost for Two: <span class="cost-highlight">₹{int(rec.estimated_cost):,}</span></span>
+                            <span class="tag-chip">{cost_tier_badge}</span>
+                            {chips_html}
+                        </div>
+                        <div class="card-reason-box">
+                            <div class="reason-label">✦ WHY THIS MATCHES YOUR CRAVING</div>
+                            <div class="reason-text">{rec.explanation}</div>
                         </div>
                     </div>
                     """,
                     unsafe_allow_html=True,
                 )
 else:
-    # Initial landing screen guidance
-    st.info("👈 **Select your dining preferences from the sidebar and click 'Get AI Recommendations' to begin!**")
+    st.info("👈 **Select your dining preferences in the sidebar and tap 'Find Recommendations' to start!**")
