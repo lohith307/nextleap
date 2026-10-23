@@ -274,44 +274,87 @@ st.markdown(
         color: var(--brand);
     }
 
-    /* Horizontal Budget Cards (Transforms st.radio) */
-    div[data-testid="stRadio"] > div {
-        display: flex !important;
-        gap: 8px !important;
-        flex-direction: row !important;
+    /* Segmented Control Styling - 3 Sleek Equal Width Cards */
+    div[data-testid="stSegmentedControl"] {
         width: 100% !important;
+        margin-bottom: 4px !important;
     }
-    div[data-testid="stRadio"] label {
+    div[data-testid="stSegmentedControl"] > div {
+        width: 100% !important;
+        display: flex !important;
+        gap: 6px !important;
+    }
+    div[data-testid="stSegmentedControl"] button {
         flex: 1 1 0 !important;
+        min-width: 0 !important;
+        background-color: #19191F !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 10px !important;
+        padding: 9px 2px !important;
+        color: #94A3B8 !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        text-align: center !important;
+        transition: all 0.2s ease !important;
+        box-shadow: none !important;
+        white-space: nowrap !important;
+    }
+    div[data-testid="stSegmentedControl"] button:hover {
+        border-color: rgba(226, 55, 68, 0.4) !important;
+        color: #FFFFFF !important;
+        background-color: #202027 !important;
+    }
+    div[data-testid="stSegmentedControl"] button[aria-checked="true"],
+    div[data-testid="stSegmentedControl"] button[data-checked="true"],
+    div[data-testid="stSegmentedControl"] button[aria-pressed="true"] {
+        background-color: rgba(226, 55, 68, 0.16) !important;
+        border-color: #E23744 !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 0 14px rgba(226, 55, 68, 0.3) !important;
+    }
+
+    /* Fallback Clean stRadio (Never create giant label card or show radio circles) */
+    div[data-testid="stRadio"] > label,
+    div[data-testid="stRadio"] label[data-testid="stWidgetLabel"] {
+        display: none !important;
+    }
+    div[data-testid="stRadio"] [role="radiogroup"] {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 6px !important;
+        width: 100% !important;
+        flex-wrap: nowrap !important;
+    }
+    div[data-testid="stRadio"] [role="radiogroup"] > label {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
         background: #19191F !important;
         border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 10px !important;
-        padding: 10px 4px !important;
+        padding: 8px 2px !important;
         text-align: center !important;
-        transition: all 0.2s ease !important;
-        cursor: pointer !important;
         display: flex !important;
-        flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
+        cursor: pointer !important;
     }
-    div[data-testid="stRadio"] label:hover {
+    div[data-testid="stRadio"] [role="radiogroup"] > label:hover {
         border-color: rgba(226, 55, 68, 0.4) !important;
         background: #202027 !important;
     }
-    div[data-testid="stRadio"] label:has(input:checked),
-    div[data-testid="stRadio"] label[data-checked="true"] {
+    div[data-testid="stRadio"] [role="radiogroup"] > label:has(input:checked) {
         background: rgba(226, 55, 68, 0.14) !important;
         border-color: #E23744 !important;
         box-shadow: 0 0 14px rgba(226, 55, 68, 0.25) !important;
     }
-    div[data-testid="stRadio"] label > div:first-child {
+    div[data-testid="stRadio"] input[type="radio"],
+    div[data-testid="stRadio"] [role="radio"] > div:first-child,
+    div[data-testid="stRadio"] [data-baseweb="radio"] > div:first-child {
         display: none !important;
-    }
-    div[data-testid="stRadio"] label span {
-        font-size: 11.5px !important;
-        font-weight: 700 !important;
-        color: #F8FAFC !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        position: absolute !important;
     }
 
     /* Sidebar Metadata Info Box */
@@ -653,13 +696,24 @@ with st.sidebar:
         "₹₹ Mid-Range": BudgetBand.MEDIUM,
         "₹₹₹ Fine Dining": BudgetBand.HIGH,
     }
-    budget_choice = st.radio(
-        "Budget Tier",
-        options=list(budget_card_map.keys()),
-        index=1,
-        horizontal=True,
-        label_visibility="collapsed",
-    )
+    if hasattr(st, "segmented_control"):
+        budget_choice = st.segmented_control(
+            "Budget Tier",
+            options=list(budget_card_map.keys()),
+            default="₹₹ Mid-Range",
+            label_visibility="collapsed",
+            width="stretch",
+        )
+        if not budget_choice:
+            budget_choice = "₹₹ Mid-Range"
+    else:
+        budget_choice = st.radio(
+            "Budget Tier",
+            options=list(budget_card_map.keys()),
+            index=1,
+            horizontal=True,
+            label_visibility="collapsed",
+        )
     selected_budget = budget_card_map[budget_choice]
 
     # 4. Minimum Rating Slider
