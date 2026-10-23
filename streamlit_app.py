@@ -1,7 +1,7 @@
 """
 Zomato AI Restaurant Recommendation System - Streamlit Web Application
 Combines structured catalog retrieval with grounded LLM reasoning for personalized recommendations.
-Replicates the ultra-premium dark-mode design system from ui/index.html.
+Replicates the ultra-premium dark-mode design system from ui/index.html with pristine sidebar controls.
 """
 import os
 import streamlit as st
@@ -54,20 +54,47 @@ st.markdown(
       --font:           'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* Global Streamlit Reset to Dark Palette */
+    /* CRITICAL FIX: Protect Streamlit Material Symbols Icons from broken ligatures (e.g. keyboard_double) */
+    [data-testid="stSidebarCollapseButton"] span,
+    [data-testid="collapsedControl"] span,
+    [data-testid="stIconMaterial"],
+    .material-symbols-rounded,
+    .material-symbols-outlined,
+    [data-testid="stHeader"] span {
+        font-family: 'Material Symbols Rounded', 'Material Symbols Outlined', 'Material Icons' !important;
+        font-weight: normal !important;
+        font-style: normal !important;
+        line-height: 1 !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
+        display: inline-block !important;
+        white-space: nowrap !important;
+        word-wrap: normal !important;
+        direction: ltr !important;
+        -webkit-font-smoothing: antialiased !important;
+        font-feature-settings: 'liga' 1 !important;
+    }
+
+    /* Global Dark Background */
     .stApp {
         background-color: var(--bg) !important;
-        font-family: var(--font) !important;
         color: var(--text-1) !important;
     }
 
+    /* Apply Plus Jakarta Sans to text elements only */
+    .stApp p, .stApp span:not([data-testid="stIconMaterial"]):not(.material-symbols-rounded), 
+    .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp label, .stApp input, .stApp button {
+        font-family: var(--font) !important;
+    }
+
+    /* Sidebar Background & Border */
     [data-testid="stSidebar"] {
         background-color: var(--bg-panel) !important;
         border-right: 1px solid var(--border-subtle) !important;
+        padding-top: 1rem !important;
     }
-
-    [data-testid="stSidebar"] * {
-        font-family: var(--font) !important;
+    [data-testid="stSidebar"] > div:first-child {
+        padding-top: 1rem !important;
     }
 
     /* Custom Scrollbar */
@@ -195,6 +222,120 @@ st.markdown(
         font-size: 11.5px;
         font-weight: 600;
         color: var(--text-2);
+    }
+
+    /* Sidebar Header Redesign */
+    .sidebar-header-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 14px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+    .sidebar-title {
+        font-size: 13.5px;
+        font-weight: 800;
+        color: #FFFFFF;
+        letter-spacing: 0.8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .red-sparkle {
+        color: var(--brand);
+        font-size: 14px;
+    }
+    .sidebar-pill {
+        background: rgba(226, 55, 68, 0.12);
+        border: 1px solid rgba(226, 55, 68, 0.3);
+        border-radius: 99px;
+        padding: 2px 8px;
+        font-size: 9.5px;
+        font-weight: 800;
+        color: #FF7B84;
+        letter-spacing: 0.6px;
+    }
+
+    /* Sidebar Clean Field Labels */
+    .sidebar-label {
+        font-size: 10.5px;
+        font-weight: 800;
+        color: var(--text-3);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-top: 14px;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .sidebar-label .req {
+        color: var(--brand);
+    }
+
+    /* Horizontal Budget Cards (Transforms st.radio) */
+    div[data-testid="stRadio"] > div {
+        display: flex !important;
+        gap: 8px !important;
+        flex-direction: row !important;
+        width: 100% !important;
+    }
+    div[data-testid="stRadio"] label {
+        flex: 1 1 0 !important;
+        background: #19191F !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 10px !important;
+        padding: 10px 4px !important;
+        text-align: center !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    div[data-testid="stRadio"] label:hover {
+        border-color: rgba(226, 55, 68, 0.4) !important;
+        background: #202027 !important;
+    }
+    div[data-testid="stRadio"] label:has(input:checked),
+    div[data-testid="stRadio"] label[data-checked="true"] {
+        background: rgba(226, 55, 68, 0.14) !important;
+        border-color: #E23744 !important;
+        box-shadow: 0 0 14px rgba(226, 55, 68, 0.25) !important;
+    }
+    div[data-testid="stRadio"] label > div:first-child {
+        display: none !important;
+    }
+    div[data-testid="stRadio"] label span {
+        font-size: 11.5px !important;
+        font-weight: 700 !important;
+        color: #F8FAFC !important;
+    }
+
+    /* Sidebar Metadata Info Box */
+    .sidebar-meta-box {
+        background: #15151A;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 14px;
+        margin-top: 20px;
+    }
+    .sidebar-meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11.5px;
+        color: var(--text-2);
+        margin-bottom: 7px;
+    }
+    .sidebar-meta-row:last-child {
+        margin-bottom: 0;
+    }
+    .sidebar-meta-val {
+        color: #FFFFFF;
+        font-weight: 700;
     }
 
     /* AI Overview Box */
@@ -349,22 +490,25 @@ st.markdown(
         line-height: 1.5;
     }
 
-    /* Streamlit Widget Styles */
-    .stButton > button {
+    /* Streamlit Form Control Overrides */
+    div[data-testid="stSidebar"] .stButton > button {
+        width: 100% !important;
         background: linear-gradient(135deg, #E23744 0%, #C02734 100%) !important;
         color: #FFFFFF !important;
-        font-weight: 800 !important;
-        border: none !important;
         border-radius: 12px !important;
-        padding: 12px 20px !important;
-        font-size: 14px !important;
-        letter-spacing: 0.3px !important;
-        box-shadow: 0 4px 20px var(--brand-glow) !important;
-        transition: all 0.22s ease !important;
+        padding: 14px 20px !important;
+        font-size: 13.5px !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.5px !important;
+        text-transform: uppercase !important;
+        box-shadow: 0 4px 20px rgba(226, 55, 68, 0.45) !important;
+        border: none !important;
+        margin-top: 12px !important;
+        transition: all 0.2s ease !important;
     }
-    .stButton > button:hover {
-        transform: translateY(-1px) !important;
-        box-shadow: 0 6px 26px rgba(226, 55, 68, 0.55) !important;
+    div[data-testid="stSidebar"] .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 26px rgba(226, 55, 68, 0.6) !important;
     }
 
     div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {
@@ -451,24 +595,35 @@ st.markdown(
 
 
 # ---------------------------------------------------------
-# Sidebar: User Preference Inputs
+# Sidebar: Redesigned Preferences Form (Matches ui/index.html)
 # ---------------------------------------------------------
 with st.sidebar:
-    st.markdown("### 🔍 **Filter & Preferences**")
+    st.markdown(
+        """
+        <div class="sidebar-header-box">
+            <div class="sidebar-title">
+                <span class="red-sparkle">✦</span> SEARCH &amp; FILTERS
+            </div>
+            <span class="sidebar-pill">CATALOG VERIFIED</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     # 1. Location
     locations = repo.get_locations()
     default_loc_idx = 0
-    for target in ["Banashankari", "Bangalore", "Koramangala", "Indiranagar"]:
+    for target in ["Banashankari", "Bangalore", "Koramangala", "Indiranagar", "Basavanagudi"]:
         if target in locations:
             default_loc_idx = locations.index(target)
             break
 
+    st.markdown('<div class="sidebar-label">LOCATION <span class="req">*</span></div>', unsafe_allow_html=True)
     selected_location = st.selectbox(
-        "📍 **Location**",
+        "Location",
         options=locations,
         index=default_loc_idx,
-        help="Select a city or locality from the verified Zomato catalog.",
+        label_visibility="collapsed",
     )
 
     # 2. Cuisine
@@ -479,47 +634,61 @@ with st.sidebar:
             default_cui_idx = cuisines.index(target)
             break
 
+    st.markdown('<div class="sidebar-label">CUISINE <span class="req">*</span></div>', unsafe_allow_html=True)
     selected_cuisine = st.selectbox(
-        "🍳 **Target Cuisine**",
+        "Cuisine",
         options=cuisines,
         index=default_cui_idx,
-        help="Target cuisine style to discover.",
+        label_visibility="collapsed",
     )
 
-    # 3. Budget Tier
-    budget_options = {
-        f"Budget (Under ₹{int(repo.p33_cost)})": BudgetBand.LOW,
-        f"Mid-range (₹{int(repo.p33_cost)} - ₹{int(repo.p66_cost)})": BudgetBand.MEDIUM,
-        f"Fine Dining (Above ₹{int(repo.p66_cost)})": BudgetBand.HIGH,
+    # 3. Budget Tier (Rendered as 3 sleek horizontal cards)
+    st.markdown(
+        f'<div class="sidebar-label">BUDGET TIER <span style="font-weight: 500; font-size: 10px; color: #64748B;">'
+        f'(p33: ₹{int(repo.p33_cost)} • p66: ₹{int(repo.p66_cost)})</span></div>',
+        unsafe_allow_html=True,
+    )
+    budget_card_map = {
+        "₹ Budget": BudgetBand.LOW,
+        "₹₹ Mid-Range": BudgetBand.MEDIUM,
+        "₹₹₹ Fine Dining": BudgetBand.HIGH,
     }
     budget_choice = st.radio(
-        "💰 **Budget Band**",
-        options=list(budget_options.keys()),
+        "Budget Tier",
+        options=list(budget_card_map.keys()),
         index=1,
-        help="Categorized based on catalog percentiles (p33 & p66).",
+        horizontal=True,
+        label_visibility="collapsed",
     )
-    selected_budget = budget_options[budget_choice]
+    selected_budget = budget_card_map[budget_choice]
 
-    # 4. Minimum Rating
+    # 4. Minimum Rating Slider
+    st.markdown(
+        '<div class="sidebar-label">MINIMUM RATING <span class="req">*</span></div>',
+        unsafe_allow_html=True,
+    )
     selected_min_rating = st.slider(
-        "⭐ **Minimum Rating**",
+        "Minimum Rating",
         min_value=3.0,
         max_value=5.0,
         value=3.8,
         step=0.1,
-        help="Filter candidates with at least this verified customer rating.",
+        label_visibility="collapsed",
     )
 
     # 5. Dietary Preference
+    st.markdown('<div class="sidebar-label">DIETARY PREFERENCE</div>', unsafe_allow_html=True)
     dietary_preference = st.selectbox(
-        "🥗 **Dietary Preference**",
+        "Dietary Preference",
         options=["Any", "Vegetarian / Pure Veg", "Non-Veg Friendly"],
         index=0,
+        label_visibility="collapsed",
     )
 
-    # 6. Ambiance & Occasion
+    # 6. Occasion & Vibe
+    st.markdown('<div class="sidebar-label">OCCASION &amp; VIBE</div>', unsafe_allow_html=True)
     ambiance_tags = st.multiselect(
-        "✨ **Ambiance / Vibe**",
+        "Ambiance",
         options=[
             "Family Dining",
             "Romantic Date Night",
@@ -530,18 +699,45 @@ with st.sidebar:
             "Live Music & Cocktails",
         ],
         default=["Family Dining"],
-        help="Select desired vibes for LLM personalization.",
+        label_visibility="collapsed",
     )
 
-    # 7. Additional Free-text Notes
+    # 7. Custom Notes
+    st.markdown('<div class="sidebar-label">CUSTOM CRAVINGS (OPTIONAL)</div>', unsafe_allow_html=True)
     additional_notes = st.text_input(
-        "📝 **Custom Cravings / Notes**",
+        "Custom Notes",
         value="",
-        placeholder="e.g. authentic biryani, quiet corner, great desserts",
+        placeholder="e.g. authentic biryani, quiet corner, outdoor seating",
+        label_visibility="collapsed",
     )
 
-    st.markdown("---")
-    search_submitted = st.button("🚀 Find Recommendations", use_container_width=True)
+    # Submit Button
+    search_submitted = st.button("🚀 GET RECOMMENDATIONS", use_container_width=True)
+
+    # Sidebar Catalog Metadata Box
+    st.markdown(
+        f"""
+        <div class="sidebar-meta-box">
+            <div class="sidebar-meta-row">
+                <span>Verified Catalog:</span>
+                <span class="sidebar-meta-val">{len(repo.restaurants):,} Restaurants</span>
+            </div>
+            <div class="sidebar-meta-row">
+                <span>Localities:</span>
+                <span class="sidebar-meta-val">{len(locations)} Areas</span>
+            </div>
+            <div class="sidebar-meta-row">
+                <span>Cuisines:</span>
+                <span class="sidebar-meta-val">{len(cuisines)} Styles</span>
+            </div>
+            <div class="sidebar-meta-row">
+                <span>Active Engine:</span>
+                <span class="sidebar-meta-val" style="color: #FFA5AB;">{active_engine}</span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 # ---------------------------------------------------------
@@ -706,4 +902,4 @@ if pref_to_run:
                     unsafe_allow_html=True,
                 )
 else:
-    st.info("👈 **Select your dining preferences in the sidebar and tap 'Find Recommendations' to start!**")
+    st.info("👈 **Select your dining preferences in the sidebar and tap 'Get Recommendations' to start!**")
