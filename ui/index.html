@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZomatoAI — AI-Powered Restaurant Discovery</title>
+  <meta name="description" content="Discover restaurants with AI-Powered Reasoning. Structured catalog filtering combined with LLM ranking for personalized picks, explained in plain language.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── Design System & CSS Variables ──────────────── */
+    :root {
+      --bg:             #09090B;
+      --bg-panel:       #121215;
+      --bg-card:        #17171C;
+      --bg-card-hover:  #1D1D23;
+      --bg-input:       #19191F;
+      --border-subtle:  rgba(255, 255, 255, 0.08);
+      --border-strong:  rgba(255, 255, 255, 0.16);
+      --brand:          #E23744;
+      --brand-hover:    #FF3B4B;
+      --brand-glow:     rgba(226, 55, 68, 0.35);
+      --brand-tint:     rgba(226, 55, 68, 0.12);
+      --brand-tint2:    rgba(226, 55, 68, 0.22);
+      --ai-purple:      #A855F7;
+      --ai-purple-tint: rgba(168, 85, 247, 0.12);
+      --ai-purple-border: rgba(168, 85, 247, 0.32);
+      --rating-green:   #22C55E;
+      --rating-green-bg:rgba(34, 197, 94, 0.16);
+      --amber:          #F59E0B;
+      --amber-tint:     rgba(245, 158, 11, 0.14);
+      --text-1:         #F8FAFC;
+      --text-2:         #94A3B8;
+      --text-3:         #64748B;
+      --radius-sm:      8px;
+      --radius-md:      12px;
+      --radius-lg:      18px;
+      --radius-xl:      24px;
+      --font:           'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --transition:     all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── Reset & Global ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--bg);
+      color: var(--text-1);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select, textarea { font-family: inherit; }
+    button { cursor: pointer; border: none; background: none; }
+    a { color: inherit; text-decoration: none; }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #26262F; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #383844; }
+
+    /* ── Sticky Top Navigation ──────────────────────── */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      background: rgba(9, 9, 11, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      height: 58px;
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+    }
+    .navbar-inner {
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-logo {
+      font-size: 23px;
+      font-weight: 900;
+      color: var(--brand);
+      letter-spacing: -0.6px;
+      display: flex;
+      align-items: center;
+    }
+    .nav-ai-pill {
+      background: rgba(226, 55, 68, 0.14);
+      border: 1px solid rgba(226, 55, 68, 0.35);
+      border-radius: 99px;
+      padding: 2px 9px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: var(--brand);
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.28);
+      border-radius: 99px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--rating-green);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--rating-green);
+      animation: pulse-dot 2s infinite ease-in-out;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 6px rgba(34,197,94,0.6); }
+      50% { opacity: 0.4; transform: scale(0.85); box-shadow: none; }
+    }
+
+    /* ── Hero Banner ────────────────────────────────── */
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 56px 20px 44px;
+      background: radial-gradient(circle at 50% -10%, #2b0207 0%, #170005 38%, var(--bg) 80%);
+      overflow: hidden;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(226, 55, 68, 0.1);
+      border: 1px solid rgba(226, 55, 68, 0.3);
+      border-radius: 99px;
+      padding: 5px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #FFA5AB;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 22px;
+    }
+    .hero-title {
+      font-size: clamp(34px, 4.8vw, 56px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -1.2px;
+      color: #FFFFFF;
+      margin-bottom: 14px;
+    }
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, #FF4B5C 0%, #FF8591 45%, #FFAAA6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+    .hero-subtitle {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--text-2);
+      max-width: 600px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+    }
+    .hero-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #15151A;
+      border: 1px solid var(--border-subtle);
+      border-radius: 99px;
+      padding: 7px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+    .hero-badge .icon { font-size: 13px; }
+
+    /* ── Main App Layout ────────────────────────────── */
+    .app-container {
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px 28px 60px;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    /* ── Left Column: Preferences Form Panel ────────── */
+    .pref-panel {
+      position: sticky;
+      top: 76px;
+      height: fit-content;
+      max-height: calc(100vh - 96px);
+      overflow-y: auto;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 22px;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .panel-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-title svg { color: var(--brand); }
+    .panel-action {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+    .form-label .req { color: var(--brand); }
+    .form-label-note {
+      font-size: 10px;
+      color: var(--text-3);
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .input-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-box .prefix-icon {
+      position: absolute;
+      left: 12px;
+      font-size: 13px;
+      color: var(--text-3);
+      pointer-events: none;
+    }
+    .text-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 14px 10px 36px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-1);
+      outline: none;
+      transition: var(--transition);
+    }
+    .text-input::placeholder { color: var(--text-3); font-weight: 400; }
+    .text-input:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px var(--brand-tint);
+    }
+
+    /* Quick Suggestion Chips */
+    .chips-flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .chip {
+      background: #181820;
+      border: 1px solid var(--border-subtle);
+      border-radius: 99px;
+      padding: 4px 11px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-2);
+      transition: var(--transition);
+      user-select: none;
+    }
+    .chip:hover {
+      border-color: rgba(226, 55, 68, 0.4);
+      color: var(--text-1);
+    }
+    .chip.active {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #FFFFFF;
+      box-shadow: 0 0 12px rgba(226, 55, 68, 0.4);
+    }
+
+    /* Budget Tier 3-Card Grid */
+    .budget-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .budget-card {
+      background: var(--bg-input);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+    }
+    .budget-card:hover { border-color: rgba(255, 255, 255, 0.2); }
+    .budget-card.active {
+      background: rgba(226, 55, 68, 0.12);
+      border-color: var(--brand);
+      box-shadow: inset 0 0 14px rgba(226, 55, 68, 0.15);
+    }
+    .budget-card .icon { font-size: 16px; margin-bottom: 4px; }
+    .budget-card .title { font-size: 12px; font-weight: 800; color: var(--text-1); }
+    .budget-card.active .title { color: var(--brand); }
+    .budget-card .range { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+    .budget-card.active .range { color: rgba(226, 55, 68, 0.8); }
+
+    /* Rating Slider */
+    .rating-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .rating-badge {
+      background: #D97706;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 9px;
+      border-radius: 99px;
+    }
+    .slider-rail {
+      width: 100%;
+      height: 4px;
+      background: #252530;
+      border-radius: 99px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .slider-rail::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--brand);
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 0 10px rgba(226, 55, 68, 0.8);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .slider-rail::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    .slider-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-3);
+    }
+
+    /* Submit Button */
+    .submit-cta {
+      width: 100%;
+      background: linear-gradient(135deg, #E23744 0%, #C02734 100%);
+      color: #FFFFFF;
+      border-radius: var(--radius-md);
+      padding: 13px 20px;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px var(--brand-glow);
+      transition: var(--transition);
+      margin-top: 8px;
+    }
+    .submit-cta:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 26px rgba(226, 55, 68, 0.55);
+    }
+    .submit-cta:disabled { opacity: 0.6; cursor: not-allowed; }
+    .submit-cta .spin {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #FFFFFF;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Right Column: Results & Split View ─────────── */
+    .results-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    /* AI Overview Banner */
+    .ai-overview-box {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(226, 55, 68, 0.08) 100%);
+      border: 1px solid var(--ai-purple-border);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .ai-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--ai-purple-tint);
+      border: 1px solid var(--ai-purple-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .ai-overview-content { flex: 1; }
+    .ai-overview-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--ai-purple);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .ai-overview-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: #E2E8F0;
+      line-height: 1.6;
+    }
+
+    /* Controls Bar: Sort & View Mode */
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .sort-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sort-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .filter-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filter-btn:hover { border-color: var(--border-strong); color: var(--text-1); }
+    .filter-btn.active {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #FFFFFF;
+      box-shadow: 0 0 12px rgba(226, 55, 68, 0.4);
+    }
+
+    .view-mode-group {
+      display: inline-flex;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 99px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .view-mode-btn {
+      padding: 5px 13px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-3);
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .view-mode-btn:hover { color: var(--text-1); }
+    .view-mode-btn.active {
+      background: var(--brand);
+      color: #FFFFFF;
+      box-shadow: 0 0 10px rgba(226, 55, 68, 0.35);
+    }
+
+    /* ── Split View Layout (Cards on Left + Map on Right) ── */
+    .split-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .split-layout.list-only {
+      grid-template-columns: 1fr;
+    }
+    .split-layout.map-only {
+      grid-template-columns: 1fr;
+    }
+    .split-layout.map-only .cards-stream {
+      display: none;
+    }
+    .split-layout.list-only .map-column {
+      display: none;
+    }
+
+    .cards-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Recommendation Card */
+    .rec-card {
+      background: var(--bg-panel);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .rec-card:hover {
+      border-color: rgba(226, 55, 68, 0.35);
+      background: var(--bg-card);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+    }
+    .rec-card.selected {
+      border-color: var(--brand);
+      background: #18151A;
+      box-shadow: 0 0 0 1px var(--brand), 0 8px 30px rgba(226, 55, 68, 0.15);
+    }
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .card-rank {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(226, 55, 68, 0.15);
+      border: 1px solid rgba(226, 55, 68, 0.3);
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-main-meta { flex: 1; min-width: 0; }
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .card-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.3px;
+    }
+    .badge-map-link {
+      background: rgba(226, 55, 68, 0.16);
+      border: 1px solid rgba(226, 55, 68, 0.35);
+      color: #FF7B84;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 99px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .card-subline {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-price-rating {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .rating-badge-green {
+      background: var(--rating-green);
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .cost-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    /* Explanation section */
+    .card-reason-box {
+      margin-top: 14px;
+      background: rgba(226, 55, 68, 0.06);
+      border: 1px solid rgba(226, 55, 68, 0.12);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+    }
+    .reason-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--brand);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+    .reason-quote {
+      font-size: 12px;
+      font-weight: 400;
+      color: #CBD5E1;
+      line-height: 1.65;
+    }
+
+    /* ── Right Subcolumn: Interactive Dark Map Widget ─ */
+    .map-column {
+      position: sticky;
+      top: 76px;
+      background: #111115;
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .map-header-overlay {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .map-tag-left {
+      background: rgba(18, 18, 22, 0.88);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 99px;
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: auto;
+    }
+    .tag-red-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--brand);
+    }
+    .map-tag-right {
+      background: rgba(18, 18, 22, 0.88);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 99px;
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-2);
+      pointer-events: auto;
+    }
+
+    /* Map Zoom Tools */
+    .map-tools {
+      position: absolute;
+      top: 56px;
+      right: 14px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .map-tool-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(23, 23, 28, 0.92);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-1);
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    .map-tool-btn:hover {
+      background: #272732;
+      border-color: var(--border-strong);
+    }
+
+    /* SVG Map Canvas */
+    .map-canvas-wrap {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #0E0E12;
+      overflow: hidden;
+      cursor: grab;
+    }
+    .map-canvas-wrap:active { cursor: grabbing; }
+
+    /* Map Pins Layer */
+    .map-pin {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      cursor: pointer;
+      z-index: 10;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .map-pin:hover, .map-pin.active {
+      transform: translate(-50%, -105%) scale(1.08);
+      z-index: 15;
+    }
+    .pin-bubble {
+      background: #1E1E26;
+      border: 1.5px solid var(--border-strong);
+      border-radius: 99px;
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #FFFFFF;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      white-space: nowrap;
+    }
+    .map-pin.active .pin-bubble {
+      background: var(--brand);
+      border-color: #FF7B84;
+      box-shadow: 0 0 24px rgba(226, 55, 68, 0.7);
+    }
+    .pin-rank {
+      font-weight: 900;
+      color: var(--brand);
+    }
+    .map-pin.active .pin-rank { color: #FFFFFF; }
+    .pin-rating {
+      background: var(--rating-green);
+      color: #FFFFFF;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .pin-pointer {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #1E1E26;
+      margin: 0 auto;
+    }
+    .map-pin.active .pin-pointer {
+      border-top-color: var(--brand);
+    }
+
+    /* Floating Focused Card on Map Bottom */
+    .map-focus-card {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      right: 14px;
+      z-index: 25;
+      background: rgba(18, 18, 24, 0.96);
+      backdrop-filter: blur(14px);
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.7);
+    }
+    .map-focus-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .focus-title-box { flex: 1; }
+    .focus-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .focus-dist {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--rating-green);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .focus-sub {
+      font-size: 11px;
+      color: var(--text-2);
+      margin-top: 2px;
+    }
+    .focus-meta-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+    }
+    .focus-snippet {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 11px;
+      color: #CBD5E1;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .map-action-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-action-red {
+      background: var(--brand);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 99px;
+      padding: 6px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: var(--transition);
+    }
+    .btn-action-red:hover { background: var(--brand-hover); }
+    .btn-action-dark {
+      background: #24242F;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-2);
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 99px;
+      padding: 6px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: var(--transition);
+    }
+    .btn-action-dark:hover { color: #FFFFFF; border-color: var(--border-strong); }
+
+    /* Loading Skeletons */
+    .skeleton-wrap {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .skeleton-wrap.active { display: flex; }
+    .skeleton-header {
+      text-align: center;
+      padding: 18px 0 6px;
+    }
+    .skel-loader-circle {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(226, 55, 68, 0.2);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      animation: spin 0.8s linear infinite;
+    }
+    .skel-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+    .skel-line {
+      height: 12px;
+      border-radius: 6px;
+      background: #202028;
+      animation: shimmer 1.5s infinite;
+      margin-bottom: 8px;
+    }
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 0.9; }
+    }
+
+    /* Empty State */
+    .empty-card {
+      background: var(--bg-panel);
+      border: 1.5px dashed var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 60px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .empty-card .icon { font-size: 44px; opacity: 0.7; }
+    .empty-card .title { font-size: 18px; font-weight: 800; color: #FFFFFF; }
+    .empty-card .desc { font-size: 13px; color: var(--text-2); max-width: 380px; line-height: 1.6; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: auto;
+    }
+    footer strong { color: var(--text-2); }
+
+    /* ── Responsive Rules ───────────────────────────── */
+    @media (max-width: 1080px) {
+      .app-container { grid-template-columns: 1fr; }
+      .pref-panel { position: static; max-height: none; }
+      .split-layout { grid-template-columns: 1fr; }
+      .map-column { height: 440px; }
+    }
+    @media (max-width: 640px) {
+      .navbar { padding: 0 16px; }
+      .hero { padding: 40px 16px 32px; }
+      .app-container { padding: 12px 14px 40px; }
+      .hero-badges { display: none; }
+      .controls-row { flex-direction: column; align-items: flex-start; }
+      .view-mode-group { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ░░ Sticky Top Navigation ░░ -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="nav-brand">
+        <a href="#" class="nav-logo">zomato</a>
+        <span class="nav-ai-pill">⚡ AI ENGINE</span>
+      </div>
+      <div class="nav-status">
+        <span class="status-dot"></span>
+        <span id="engineBadgeText">AI Ready (Live)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ░░ Hero Section ░░ -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <span>⚡</span> PERPLEXITY × ZOMATO HYBRID DISCOVERY
+    </div>
+    <h1 class="hero-title">
+      Discover restaurants with<br>
+      <span class="gradient-text">AI–Powered Reasoning</span>
+    </h1>
+    <p class="hero-subtitle">
+      Structured catalog filtering combined with LLM ranking — personalized picks, explained in plain language.
+    </p>
+    <div class="hero-badges">
+      <div class="hero-badge"><span class="icon">🍽</span> 7,000+ Restaurants</div>
+      <div class="hero-badge"><span class="icon">🤖</span> LLM-Ranked Results</div>
+      <div class="hero-badge"><span class="icon">⚡</span> Live Natural Language Justifications</div>
+    </div>
+  </section>
+
+  <!-- ░░ Main App Layout ░░ -->
+  <main class="app-container">
+
+    <!-- ── Left Column: Preferences Form ── -->
+    <aside class="pref-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+          Your Preferences
+        </div>
+        <span class="panel-action">Config</span>
+      </div>
+
+      <form id="prefForm" novalidate>
+
+        <!-- Location -->
+        <div class="form-group">
+          <label class="form-label" for="inputLocation">
+            <span>Location <span class="req">*</span></span>
+          </label>
+          <div class="input-box">
+            <span class="prefix-icon">📍</span>
+            <input type="text" id="inputLocation" name="location" class="text-input"
+              placeholder="e.g. Koramangala, Indiranagar" value="Koramangala" required list="locationsDataList" autocomplete="off">
+            <datalist id="locationsDataList"></datalist>
+          </div>
+          <div class="chips-flex" id="locationChips">
+            <button type="button" class="chip active" data-val="Koramangala">Koramangala</button>
+            <button type="button" class="chip" data-val="Indiranagar">Indiranagar</button>
+            <button type="button" class="chip" data-val="Whitefield">Whitefield</button>
+            <button type="button" class="chip" data-val="HSR">HSR</button>
+            <button type="button" class="chip" data-val="BTM">BTM</button>
+            <button type="button" class="chip" data-val="Jayanagar">Jayanagar</button>
+          </div>
+        </div>
+
+        <!-- Cuisine -->
+        <div class="form-group">
+          <label class="form-label" for="inputCuisine">
+            <span>Cuisine <span class="req">*</span></span>
+          </label>
+          <div class="input-box">
+            <span class="prefix-icon">🍴</span>
+            <input type="text" id="inputCuisine" name="cuisine" class="text-input"
+              placeholder="e.g. North Indian, Biryani" value="North Indian" required list="cuisinesDataList" autocomplete="off">
+            <datalist id="cuisinesDataList"></datalist>
+          </div>
+          <div class="chips-flex" id="cuisineChips">
+            <button type="button" class="chip active" data-val="North Indian">North Indian</button>
+            <button type="button" class="chip" data-val="South Indian">South Indian</button>
+            <button type="button" class="chip" data-val="Biryani">Biryani</button>
+            <button type="button" class="chip" data-val="Chinese">Chinese</button>
+            <button type="button" class="chip" data-val="Italian">Italian</button>
+          </div>
+        </div>
+
+        <!-- Budget Tier -->
+        <div class="form-group">
+          <label class="form-label">
+            <span>Budget Tier <span class="req">*</span></span>
+          </label>
+          <div class="budget-grid">
+            <div class="budget-card" data-budget="low">
+              <div class="icon">💰</div>
+              <div class="title">Low</div>
+              <div class="range">≤ ₹350</div>
+            </div>
+            <div class="budget-card active" data-budget="medium">
+              <div class="icon">💳</div>
+              <div class="title">Medium</div>
+              <div class="range">₹300–₹600</div>
+            </div>
+            <div class="budget-card" data-budget="high">
+              <div class="icon">✨</div>
+              <div class="title">High</div>
+              <div class="range">₹500+</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Minimum Rating -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Minimum Rating</span>
+            <span class="rating-badge" id="ratingLabel">3.8 ★</span>
+          </div>
+          <div class="rating-wrap">
+            <input type="range" id="ratingSlider" min="3.0" max="4.8" step="0.1" value="3.8" class="slider-rail">
+            <div class="slider-ticks">
+              <span>3.0 ★</span>
+              <span>4.0 ★</span>
+              <span>4.8 ★</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Preferences -->
+        <div class="form-group">
+          <label class="form-label" for="inputExtras">
+            <span>Additional Preferences</span>
+            <span class="form-label-note">(used by AI for ranking)</span>
+          </label>
+          <div class="input-box">
+            <span class="prefix-icon">✨</span>
+            <input type="text" id="inputExtras" name="additional_preferences" class="text-input"
+              placeholder="e.g. family-friendly, casual dining" value="family-friendly, casual dining">
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-cta" id="btnSubmit">
+          <span id="btnIcon">⚡</span>
+          <div class="spin" id="btnSpinner" style="display:none"></div>
+          <span id="btnText">Find &amp; Recommend</span>
+        </button>
+
+      </form>
+    </aside>
+
+    <!-- ── Right Column: Results & Interactive Split View ── -->
+    <section class="results-col">
+
+      <!-- AI Overview Banner -->
+      <div class="ai-overview-box" id="aiOverviewBox">
+        <div class="ai-icon-box">🤖</div>
+        <div class="ai-overview-content">
+          <div class="ai-overview-label">✦ AI Overview</div>
+          <p class="ai-overview-text" id="aiOverviewText">
+            Identified top-tier North Indian dining picks in Koramangala matching your medium budget tier and &ge; 3.8 rating. Ranked using family-friendly ambiance, food consistency, and overall value.
+          </p>
+        </div>
+      </div>
+
+      <!-- Controls Row: Sort & View Mode -->
+      <div class="controls-row" id="controlsRow">
+        <div class="sort-group">
+          <span class="sort-label">↓ Sort:</span>
+          <button type="button" class="filter-btn active" data-sort="ai">🤖 AI Recommended</button>
+          <button type="button" class="filter-btn" data-sort="rating">★ Highest Rating</button>
+          <button type="button" class="filter-btn" data-sort="cost-asc">₹ Cost: Low to High</button>
+          <button type="button" class="filter-btn" data-sort="cost-desc">₹₹₹ Cost: High to Low</button>
+        </div>
+        <div class="view-mode-group">
+          <button type="button" class="view-mode-btn active" data-view="split">⚡ Split View</button>
+          <button type="button" class="view-mode-btn" data-view="list">☰ List</button>
+          <button type="button" class="view-mode-btn" data-view="map">🗺 Map</button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="skeleton-wrap" id="skeletonWrap">
+        <div class="skeleton-header">
+          <div class="skel-loader-circle"></div>
+          <div style="font-size:13px; font-weight:700; color:#E2E8F0">Filtering catalog &amp; reasoning with LLM…</div>
+          <div style="font-size:11px; color:#64748B; margin-top:4px">Step 1: Catalog filter &rarr; Step 2: LLM ranking</div>
+        </div>
+        <div class="skel-card">
+          <div class="skel-line" style="width:40%"></div>
+          <div class="skel-line" style="width:65%"></div>
+          <div class="skel-line" style="width:85%; height:40px; margin-top:14px"></div>
+        </div>
+        <div class="skel-card">
+          <div class="skel-line" style="width:45%"></div>
+          <div class="skel-line" style="width:60%"></div>
+          <div class="skel-line" style="width:85%; height:40px; margin-top:14px"></div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-card" id="emptyState" style="display:none">
+        <div class="icon">🍽</div>
+        <div class="title" id="emptyTitle">Ready for recommendations</div>
+        <div class="desc" id="emptyDesc">Specify your preferences on the left and click Find &amp; Recommend.</div>
+      </div>
+
+      <!-- ── Split View Layout ── -->
+      <div class="split-layout" id="splitLayout">
+
+        <!-- Subcolumn 1: Cards List -->
+        <div class="cards-stream" id="cardsStream"></div>
+
+        <!-- Subcolumn 2: Interactive Styled Map Widget -->
+        <div class="map-column" id="mapColumn">
+          <!-- Top Floating Map Header -->
+          <div class="map-header-overlay">
+            <div class="map-tag-left">
+              <span class="tag-red-dot"></span>
+              <span id="mapCounter">Showing 4 AI Recommendations</span>
+            </div>
+            <div class="map-tag-right" id="mapAreaTag">
+              📍 Koramangala &amp; Indiranagar
+            </div>
+          </div>
+
+          <!-- Zoom Tools -->
+          <div class="map-tools">
+            <button type="button" class="map-tool-btn" id="mapZoomIn" title="Zoom in">+</button>
+            <button type="button" class="map-tool-btn" id="mapZoomOut" title="Zoom out">&minus;</button>
+            <button type="button" class="map-tool-btn" id="mapRecenter" title="Recenter location">⌖</button>
+          </div>
+
+          <!-- SVG Dark Map Canvas -->
+          <div class="map-canvas-wrap" id="mapCanvas">
+            <svg width="100%" height="100%" viewBox="0 0 800 900" preserveAspectRatio="none" style="display:block">
+              <defs>
+                <linearGradient id="roadGlow" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#22222E" />
+                  <stop offset="100%" stop-color="#2E2E3E" />
+                </linearGradient>
+                <linearGradient id="highwayGlow" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3A2D35" />
+                  <stop offset="100%" stop-color="#2D2430" />
+                </linearGradient>
+                <filter id="glowFilter">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Dark city ground tiles -->
+              <rect width="800" height="900" fill="#0C0D11" />
+
+              <!-- Park Area -->
+              <path d="M 520,380 Q 640,340 760,420 L 800,560 L 580,580 Z" fill="#101815" stroke="#14261F" stroke-width="1.5" />
+              <text x="640" y="460" fill="#2E4C3E" font-size="11" font-weight="800" letter-spacing="1">REGIONAL PARK</text>
+
+              <!-- Neighborhood labels -->
+              <text x="60" y="720" fill="#2E2E3A" font-size="16" font-weight="900" letter-spacing="2">KORAMANGALA 5TH BLK</text>
+              <text x="440" y="160" fill="#2E2E3A" font-size="16" font-weight="900" letter-spacing="2">INDIRANAGAR 100FT</text>
+
+              <!-- Secondary roads grid -->
+              <g stroke="url(#roadGlow)" stroke-width="2" stroke-linecap="round" opacity="0.6">
+                <line x1="40" y1="120" x2="760" y2="120" />
+                <line x1="40" y1="280" x2="760" y2="280" />
+                <line x1="40" y1="440" x2="760" y2="440" />
+                <line x1="40" y1="620" x2="760" y2="620" />
+                <line x1="40" y1="780" x2="760" y2="780" />
+                <line x1="160" y1="40" x2="160" y2="860" />
+                <line x1="320" y1="40" x2="320" y2="860" />
+                <line x1="480" y1="40" x2="480" y2="860" />
+                <line x1="660" y1="40" x2="660" y2="860" />
+              </g>
+
+              <!-- Major Highways & Arteries -->
+              <g stroke="#3D2028" stroke-width="7" stroke-linecap="round" opacity="0.75">
+                <path d="M 60,820 C 220,680 380,500 520,240 S 720,100 780,80" fill="none" />
+                <path d="M 80,180 C 240,260 480,480 720,740" fill="none" />
+              </g>
+              <g stroke="#E23744" stroke-width="2" stroke-linecap="round" opacity="0.4" filter="url(#glowFilter)">
+                <path d="M 60,820 C 220,680 380,500 520,240 S 720,100 780,80" fill="none" />
+              </g>
+
+              <!-- Route connections connecting recommendation pins -->
+              <path d="M 280,480 L 460,420 L 580,240 L 260,700" fill="none" stroke="#E23744" stroke-width="1.8" stroke-dasharray="6,4" opacity="0.6" />
+            </svg>
+
+            <!-- Dynamic Interactive HTML Pins Layer -->
+            <div id="mapPinsLayer"></div>
+
+            <!-- Floating Focused Card on Map Bottom -->
+            <div class="map-focus-card" id="mapFocusCard">
+              <div class="map-focus-top">
+                <div class="focus-title-box">
+                  <div class="focus-title">
+                    <span id="focusRank" style="color:var(--brand); font-weight:900">#1</span>
+                    <span id="focusName">Spice Garden &amp; Bistro</span>
+                    <span class="focus-dist" id="focusDist">0.8 km</span>
+                  </div>
+                  <div class="focus-sub" id="focusSub">North Indian, Mughlai, Chinese · Koramangala 5th Block</div>
+                </div>
+                <div class="focus-meta-right">
+                  <span class="rating-badge-green" id="focusRating">4.4 ★</span>
+                  <span class="cost-text" id="focusCost">₹480 for two</span>
+                </div>
+              </div>
+              <div class="focus-snippet" id="focusSnippet">
+                "Spice Garden perfectly balances authentic slow-cooked North Indian gravies with a comfortable family ambiance. Its 4.4 rating comfortably clears your 3.8 threshold, and the pricing sits right in your medium budget sweet spot."
+              </div>
+              <div class="map-action-row">
+                <button type="button" class="btn-action-red" id="btnDirections">↗ Directions</button>
+                <button type="button" class="btn-action-dark" id="btnMenu">📖 Menu</button>
+                <button type="button" class="btn-action-dark" id="btnFocus">⌖ Focus</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ░░ Footer ░░ -->
+  <footer>
+    AI-Powered Restaurant Recommendation System: <strong>Zomato Dataset + LLM Integration</strong> · ZomatoAI Engine
+  </footer>
+
+  <script>
+    /* ── Initial Mock Data (matching user's screenshot exactly!) ── */
+    const initialData = {
+      summary: "Identified 4 top-tier North Indian dining picks in Koramangala matching your medium budget tier and \u2265 3.8 rating. Ranked using family-friendly ambiance, food consistency, and overall value.",
+      recommendations: [
+        {
+          rank: 1,
+          name: "Spice Garden & Bistro",
+          cuisine: "North Indian, Mughlai, Chinese · Koramangala 5th Block",
+          rating: 4.4,
+          estimated_cost: 480,
+          dist: "0.8 km",
+          coords: { x: 42, y: 52 },
+          explanation: "Spice Garden perfectly balances authentic slow-cooked North Indian gravies with a comfortable family ambiance. Its 4.4 rating comfortably clears your 3.8 threshold, and the pricing sits right in your medium budget sweet spot."
+        },
+        {
+          rank: 2,
+          name: "The Punjabi Rasoi",
+          cuisine: "North Indian, Tandoor · Koramangala 4th Block",
+          rating: 4.3,
+          estimated_cost: 380,
+          dist: "1.2 km",
+          coords: { x: 34, y: 72 },
+          explanation: "Renowned for robust Dal Makhani and piping hot butter naans. The relaxed casual seating matches your dining preference, and generous portion sizes ensure top-tier value per plate."
+        },
+        {
+          rank: 3,
+          name: "Copper Chimney",
+          cuisine: "North Indian, Mughlai, Biryani · Indiranagar 100ft Road",
+          rating: 4.6,
+          estimated_cost: 590,
+          dist: "2.8 km",
+          coords: { x: 70, y: 28 },
+          explanation: "A heritage pick with impeccable dum-cooked curries and elevated table service. Ideal if you appreciate subtle spices, reliable consistency, and prompt hospitality."
+        },
+        {
+          rank: 4,
+          name: "Dhaba Estd 1986 Delhi",
+          cuisine: "North Indian, Street Food · Koramangala 7th Block",
+          rating: 4.1,
+          estimated_cost: 320,
+          dist: "1.9 km",
+          coords: { x: 58, y: 44 },
+          explanation: "Authentic rustic highway dhaba style platters with speedy service. The ₹320 price point makes it an unbeatable pocket-friendly option for hearty North Indian comfort food."
+        }
+      ]
+    };
+
+    /* ── State ──────────────────────────────────────── */
+    let currentRecs = [...initialData.recommendations];
+    let selectedIndex = 0;
+    let currentSort = 'ai';
+    let currentView = 'split';
+    let currentBudget = 'medium';
+
+    /* ── DOM Elements ───────────────────────────────── */
+    const prefForm          = document.getElementById('prefForm');
+    const inputLocation     = document.getElementById('inputLocation');
+    const inputCuisine      = document.getElementById('inputCuisine');
+    const inputExtras       = document.getElementById('inputExtras');
+    const ratingSlider      = document.getElementById('ratingSlider');
+    const ratingLabel       = document.getElementById('ratingLabel');
+    const btnSubmit         = document.getElementById('btnSubmit');
+    const btnIcon           = document.getElementById('btnIcon');
+    const btnSpinner        = document.getElementById('btnSpinner');
+    const btnText           = document.getElementById('btnText');
+    const aiOverviewBox     = document.getElementById('aiOverviewBox');
+    const aiOverviewText    = document.getElementById('aiOverviewText');
+    const controlsRow       = document.getElementById('controlsRow');
+    const skeletonWrap      = document.getElementById('skeletonWrap');
+    const emptyState        = document.getElementById('emptyState');
+    const emptyTitle        = document.getElementById('emptyTitle');
+    const emptyDesc         = document.getElementById('emptyDesc');
+    const splitLayout       = document.getElementById('splitLayout');
+    const cardsStream       = document.getElementById('cardsStream');
+    const mapColumn         = document.getElementById('mapColumn');
+    const mapPinsLayer      = document.getElementById('mapPinsLayer');
+    const mapCounter        = document.getElementById('mapCounter');
+    const mapAreaTag        = document.getElementById('mapAreaTag');
+    const engineBadgeText   = document.getElementById('engineBadgeText');
+
+    /* Floating Card Elements */
+    const focusRank         = document.getElementById('focusRank');
+    const focusName         = document.getElementById('focusName');
+    const focusDist         = document.getElementById('focusDist');
+    const focusSub          = document.getElementById('focusSub');
+    const focusRating       = document.getElementById('focusRating');
+    const focusCost         = document.getElementById('focusCost');
+    const focusSnippet      = document.getElementById('focusSnippet');
+
+    /* ── Rating Slider Behavior ─────────────────────── */
+    ratingSlider.addEventListener('input', () => {
+      const val = parseFloat(ratingSlider.value).toFixed(1);
+      ratingLabel.textContent = `${val} ★`;
+      const pct = ((val - 3.0) / (4.8 - 3.0)) * 100;
+      ratingSlider.style.background = `linear-gradient(to right, var(--brand) ${pct}%, #252530 ${pct}%)`;
+    });
+    ratingSlider.dispatchEvent(new Event('input'));
+
+    /* ── Budget Cards Behavior ──────────────────────── */
+    document.querySelectorAll('.budget-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.budget-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        currentBudget = card.dataset.budget;
+      });
+    });
+
+    /* ── Quick Chips Behavior ───────────────────────── */
+    function setupChips(containerId, inputElement) {
+      document.querySelectorAll(`#${containerId} .chip`).forEach(chip => {
+        chip.addEventListener('click', () => {
+          const val = chip.dataset.val;
+          document.querySelectorAll(`#${containerId} .chip`).forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          inputElement.value = val;
+        });
+      });
+    }
+    setupChips('locationChips', inputLocation);
+    setupChips('cuisineChips', inputCuisine);
+
+    /* ── Sort & View Mode Toggles ───────────────────── */
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSort = btn.dataset.sort;
+        applySortAndRender();
+      });
+    });
+
+    document.querySelectorAll('.view-mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentView = btn.dataset.view;
+
+        splitLayout.classList.remove('list-only', 'map-only');
+        if (currentView === 'list') {
+          splitLayout.classList.add('list-only');
+        } else if (currentView === 'map') {
+          splitLayout.classList.add('map-only');
+        }
+      });
+    });
+
+    /* ── Rendering Recommendation Cards & Map Pins ──── */
+    function renderResults(recs) {
+      if (!recs || recs.length === 0) {
+        splitLayout.style.display = 'none';
+        emptyState.style.display = 'flex';
+        emptyTitle.textContent = "No Matching Restaurants";
+        emptyDesc.textContent = "Try lowering the minimum rating or changing your cuisine/location.";
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      splitLayout.style.display = 'grid';
+      cardsStream.innerHTML = '';
+      mapPinsLayer.innerHTML = '';
+
+      mapCounter.textContent = `Showing ${recs.length} AI Recommendations`;
+      const locText = inputLocation.value.trim() || 'Koramangala';
+      mapAreaTag.textContent = `📍 ${locText}`;
+
+      recs.forEach((item, index) => {
+        /* 1. Build List Card */
+        const card = document.createElement('div');
+        card.className = `rec-card ${index === selectedIndex ? 'selected' : ''}`;
+        card.setAttribute('data-index', index);
+        card.innerHTML = `
+          <div class="card-top">
+            <div class="card-rank">#${item.rank}</div>
+            <div class="card-main-meta">
+              <div class="card-title-row">
+                <span class="card-name">${escapeHtml(item.name)}</span>
+                ${index === selectedIndex ? '<span class="badge-map-link">↑ LINKED TO MAP</span>' : ''}
+              </div>
+              <div class="card-subline">${escapeHtml(item.cuisine)}</div>
+            </div>
+            <div class="card-price-rating">
+              <span class="rating-badge-green">${Number(item.rating).toFixed(1)} ★</span>
+              <span class="cost-text">₹${Math.round(item.estimated_cost)} for two</span>
+            </div>
+          </div>
+          <div class="card-reason-box">
+            <div class="reason-label">✦ WHY THIS MATCHES YOU</div>
+            <p class="reason-quote">"${escapeHtml(item.explanation)}"</p>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          selectRestaurant(index);
+        });
+
+        cardsStream.appendChild(card);
+
+        /* 2. Build Map Pin */
+        // Calculate coords if missing
+        const xPos = item.coords ? item.coords.x : (30 + ((index * 22) % 60));
+        const yPos = item.coords ? item.coords.y : (25 + ((index * 28) % 60));
+
+        const pin = document.createElement('div');
+        pin.className = `map-pin ${index === selectedIndex ? 'active' : ''}`;
+        pin.style.left = `${xPos}%`;
+        pin.style.top = `${yPos}%`;
+        pin.setAttribute('data-index', index);
+        pin.innerHTML = `
+          <div class="pin-bubble">
+            <span class="pin-rank">#${item.rank}</span>
+            <span>${escapeHtml(item.name)}</span>
+            <span class="pin-rating">${Number(item.rating).toFixed(1)} ★</span>
+          </div>
+          <div class="pin-pointer"></div>
+        `;
+
+        pin.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectRestaurant(index);
+        });
+
+        mapPinsLayer.appendChild(pin);
+      });
+
+      // Update focused map card with currently selected
+      updateFocusCard(recs[selectedIndex] || recs[0]);
+    }
+
+    /* ── Select Restaurant (Sync List + Map) ────────── */
+    function selectRestaurant(index) {
+      selectedIndex = index;
+      const targetItem = currentRecs[index];
+      if (!targetItem) return;
+
+      // Update Card selections
+      document.querySelectorAll('.rec-card').forEach((c, i) => {
+        if (i === index) {
+          c.classList.add('selected');
+          const titleRow = c.querySelector('.card-title-row');
+          if (titleRow && !titleRow.querySelector('.badge-map-link')) {
+            const badge = document.createElement('span');
+            badge.className = 'badge-map-link';
+            badge.innerHTML = '↑ LINKED TO MAP';
+            titleRow.appendChild(badge);
+          }
+          c.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+          c.classList.remove('selected');
+          const badge = c.querySelector('.badge-map-link');
+          if (badge) badge.remove();
+        }
+      });
+
+      // Update Map Pins
+      document.querySelectorAll('.map-pin').forEach((p, i) => {
+        if (i === index) p.classList.add('active');
+        else p.classList.remove('active');
+      });
+
+      // Update Focused Card
+      updateFocusCard(targetItem);
+    }
+
+    function updateFocusCard(item) {
+      if (!item) return;
+      focusRank.textContent = `#${item.rank}`;
+      focusName.textContent = item.name;
+      focusDist.textContent = item.dist || `${(0.6 + item.rank * 0.4).toFixed(1)} km`;
+      focusSub.textContent = item.cuisine;
+      focusRating.textContent = `${Number(item.rating).toFixed(1)} ★`;
+      focusCost.textContent = `₹${Math.round(item.estimated_cost)} for two`;
+      focusSnippet.textContent = `"${item.explanation}"`;
+    }
+
+    /* ── Sorting Logic ──────────────────────────────── */
+    function applySortAndRender() {
+      const sorted = [...currentRecs];
+      if (currentSort === 'rating') {
+        sorted.sort((a, b) => b.rating - a.rating);
+      } else if (currentSort === 'cost-asc') {
+        sorted.sort((a, b) => a.estimated_cost - b.estimated_cost);
+      } else if (currentSort === 'cost-desc') {
+        sorted.sort((a, b) => b.estimated_cost - a.estimated_cost);
+      } else {
+        sorted.sort((a, b) => a.rank - b.rank);
+      }
+      currentRecs = sorted;
+      selectedIndex = 0;
+      renderResults(currentRecs);
+    }
+
+    /* ── Form Submission to Backend /api/recommend ──── */
+    prefForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const locationVal = inputLocation.value.trim();
+      const cuisineVal = inputCuisine.value.trim();
+      const ratingVal = parseFloat(ratingSlider.value);
+      const extrasVal = inputExtras.value.trim();
+
+      if (!locationVal) {
+        inputLocation.focus();
+        return;
+      }
+      if (!cuisineVal) {
+        inputCuisine.focus();
+        return;
+      }
+
+      // UI Loading State
+      btnSubmit.disabled = true;
+      btnIcon.style.display = 'none';
+      btnSpinner.style.display = 'block';
+      btnText.textContent = "Reasoning...";
+      skeletonWrap.classList.add('active');
+      splitLayout.style.display = 'none';
+      emptyState.style.display = 'none';
+      aiOverviewBox.style.opacity = '0.5';
+
+      const payload = {
+        location: locationVal,
+        cuisine: cuisineVal,
+        budget: currentBudget,
+        min_rating: ratingVal,
+        additional_preferences: extrasVal
+      };
+
+      try {
+        const response = await fetch('/api/recommend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        skeletonWrap.classList.remove('active');
+        btnSubmit.disabled = false;
+        btnIcon.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        btnText.textContent = "Find & Recommend";
+        aiOverviewBox.style.opacity = '1';
+
+        if (!response.ok) {
+          splitLayout.style.display = 'none';
+          emptyState.style.display = 'flex';
+          emptyTitle.textContent = "Search Notice";
+          emptyDesc.textContent = data.detail || "Unable to retrieve recommendations. Try adjusting your search.";
+          return;
+        }
+
+        if (data.summary) {
+          aiOverviewText.textContent = data.summary;
+          aiOverviewBox.style.display = 'flex';
+        }
+
+        if (data.recommendations && data.recommendations.length > 0) {
+          // Pre-assign simulated map coordinates around location
+          currentRecs = data.recommendations.map((item, idx) => ({
+            ...item,
+            coords: item.coords || {
+              x: 25 + ((idx * 23 + (idx % 2) * 15) % 55),
+              y: 22 + ((idx * 27 + (idx % 3) * 12) % 58)
+            },
+            dist: `${(0.7 + idx * 0.5).toFixed(1)} km`
+          }));
+          selectedIndex = 0;
+          renderResults(currentRecs);
+        } else {
+          splitLayout.style.display = 'none';
+          emptyState.style.display = 'flex';
+          emptyTitle.textContent = "No Matching Restaurants";
+          emptyDesc.textContent = data.message || "No catalog entries satisfied all criteria. Try relaxing your rating or budget.";
+        }
+
+      } catch (err) {
+        console.warn("Backend fetch failed, rendering demo state:", err);
+        skeletonWrap.classList.remove('active');
+        btnSubmit.disabled = false;
+        btnIcon.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        btnText.textContent = "Find & Recommend";
+        aiOverviewBox.style.opacity = '1';
+
+        // Fallback to initial demo
+        currentRecs = [...initialData.recommendations];
+        selectedIndex = 0;
+        renderResults(currentRecs);
+      }
+    });
+
+    /* ── Backend Health & Auto-complete Setup ───────── */
+    async function loadCatalogMeta() {
+      try {
+        const healthRes = await fetch('/api/health');
+        if (healthRes.ok) {
+          const health = await healthRes.json();
+          engineBadgeText.textContent = `${health.llm_engine || 'AI'} Ready (${health.total_restaurants || '7,000+'} Live)`;
+        }
+      } catch (_) {}
+
+      try {
+        const [locRes, cuiRes] = await Promise.all([
+          fetch('/api/locations'),
+          fetch('/api/cuisines')
+        ]);
+        if (locRes.ok) {
+          const locs = await locRes.json();
+          const datalist = document.getElementById('locationsDataList');
+          datalist.innerHTML = locs.slice(0, 50).map(l => `<option value="${escapeHtml(l)}">`).join('');
+        }
+        if (cuiRes.ok) {
+          const cuis = await cuiRes.json();
+          const datalist = document.getElementById('cuisinesDataList');
+          datalist.innerHTML = cuis.slice(0, 50).map(c => `<option value="${escapeHtml(c)}">`).join('');
+        }
+      } catch (_) {}
+    }
+
+    /* ── Utility: Escape HTML ───────────────────────── */
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /* ── Map Tool Buttons Interaction ───────────────── */
+    document.getElementById('mapZoomIn').addEventListener('click', () => {
+      mapPinsLayer.style.transform = 'scale(1.1)';
+      mapPinsLayer.style.transition = 'transform 0.3s';
+      setTimeout(() => { mapPinsLayer.style.transform = 'scale(1)'; }, 300);
+    });
+    document.getElementById('mapZoomOut').addEventListener('click', () => {
+      mapPinsLayer.style.transform = 'scale(0.92)';
+      mapPinsLayer.style.transition = 'transform 0.3s';
+      setTimeout(() => { mapPinsLayer.style.transform = 'scale(1)'; }, 300);
+    });
+    document.getElementById('mapRecenter').addEventListener('click', () => {
+      selectRestaurant(0);
+    });
+
+    // Initial render matching screenshot
+    renderResults(currentRecs);
+    loadCatalogMeta();
+  </script>
+</body>
+</html>
