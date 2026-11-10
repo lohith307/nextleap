@@ -1,0 +1,42 @@
+{
+  "delivery_delays_riders": {
+    "theme_name": "Delivery Delays & Rider Operations",
+    "review_count": 170,
+    "percentage_share": 54.8,
+    "negative_review_count": 153,
+    "average_star_rating": 1.39,
+    "severity_score": 552.3
+  },
+  "customer_support_bot": {
+    "theme_name": "Customer Support & Chatbot Looping",
+    "review_count": 202,
+    "percentage_share": 65.2,
+    "negative_review_count": 196,
+    "average_star_rating": 1.11,
+    "severity_score": 762.4
+  },
+  "payment_upi_glitches": {
+    "theme_name": "App Stability & Payment/UPI Failures",
+    "review_count": 125,
+    "percentage_share": 40.3,
+    "negative_review_count": 113,
+    "average_star_rating": 1.39,
+    "severity_score": 407.9
+  },
+  "pricing_gold_fees": {
+    "theme_name": "Platform Pricing, Hidden Fees & Gold MOQ",
+    "review_count": 90,
+    "percentage_share": 29.0,
+    "negative_review_count": 84,
+    "average_star_rating": 1.28,
+    "severity_score": 312.5
+  },
+  "food_quality_packaging": {
+    "theme_name": "Food Quality, Packaging Spills & Broken Seals",
+    "review_count": 79,
+    "percentage_share": 25.5,
+    "negative_review_count": 77,
+    "average_star_rating": 1.1,
+    "severity_score": 300.3
+  }
+}

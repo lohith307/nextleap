@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "google-docs": {
+      "command": "python",
+      "args": ["-m", "tests.mock_mcp_server"],
+      "env": {
+        "SERVER_NAME": "google-docs"
+      }
+    },
+    "gmail": {
+      "command": "python",
+      "args": ["-m", "tests.mock_mcp_server"],
+      "env": {
+        "SERVER_NAME": "gmail"
+      }
+    }
+  }
+}
+

@@ -1,0 +1,46 @@
+{
+  "date_range": "2026-08-15T15:24:46 to 2026-11-05T21:00:40",
+  "total_reviews_analyzed": 310,
+  "top_themes": [
+    {
+      "theme_id": "customer_support_bot",
+      "theme_name": "Customer Support & Chatbot Looping",
+      "percentage_share": 59.0,
+      "executive_summary": "Diners are trapped in automated chatbot loops with no escalation path to human support, leading to automated refund rejections on missing items.",
+      "selected_verbatim_quote": "They always try to convert to another currency with inconvenient rate, I many times ticked \"remember for future payments\" and still sets the wrong currency by default.",
+      "action_idea": "**Escalation Trigger for Missing Items:** Automatically route chat sessions to human agents when visual photo evidence of wrong or missing food is uploaded."
+    },
+    {
+      "theme_id": "delivery_delays_riders",
+      "theme_name": "Delivery Delays & Rider Operations",
+      "percentage_share": 59.0,
+      "executive_summary": "Frequent 30–50 min uncommunicated delivery delays caused by assigning riders located far away from merchant hubs.",
+      "selected_verbatim_quote": "Then, check the time a few minutes later, you will notice that there is a discrepancy in the time that has passed since you placed the order and the actual delivery time.",
+      "action_idea": "**Dynamic Rider Radius Cap:** Restrict dispatch assignments to riders within a 3km radius of restaurants during dinner peak hours (7–10 PM)."
+    },
+    {
+      "theme_id": "food_quality_packaging",
+      "theme_name": "Food Quality, Packaging Spills & Broken Seals",
+      "percentage_share": 45.2,
+      "executive_summary": "Spilled gravies, broken safety seals, and cold food delivery leading to high refund dispute rates.",
+      "selected_verbatim_quote": "They show you a certain time the food will reach in & then manipulate the time without you noticing.",
+      "action_idea": "**Merchant Spill-Proof Seal Audits:** Mandate tamper-evident packaging badges for top spilled categories and penalize recurring leakages."
+    }
+  ],
+  "verbatim_quotes": [
+    "They always try to convert to another currency with inconvenient rate, I many times ticked \"remember for future payments\" and still sets the wrong currency by default.",
+    "Then, check the time a few minutes later, you will notice that there is a discrepancy in the time that has passed since you placed the order and the actual delivery time.",
+    "They show you a certain time the food will reach in & then manipulate the time without you noticing."
+  ],
+  "action_ideas": [
+    "**Escalation Trigger for Missing Items:** Automatically route chat sessions to human agents when visual photo evidence of wrong or missing food is uploaded.",
+    "**Dynamic Rider Radius Cap:** Restrict dispatch assignments to riders within a 3km radius of restaurants during dinner peak hours (7–10 PM).",
+    "**Merchant Spill-Proof Seal Audits:** Mandate tamper-evident packaging badges for top spilled categories and penalize recurring leakages."
+  ],
+  "weekly_pulse_markdown": "# Zomato Customer Pulse — Week of 2026-08-15T15:24:46 to 2026-11-05T21:00:40\n\n### Top Themes\n1. **Customer Support & Chatbot Looping (59.0% mentions):** Diners are trapped in automated chatbot loops with no escalation path to human support, leading to automated refund rejections on missing items.\n2. **Delivery Delays & Rider Operations (59.0% mentions):** Frequent 30–50 min uncommunicated delivery delays caused by assigning riders located far away from merchant hubs.\n3. **Food Quality, Packaging Spills & Broken Seals (45.2% mentions):** Spilled gravies, broken safety seals, and cold food delivery leading to high refund dispute rates.\n\n### What Users Are Saying\n- *\"They always try to convert to another currency with inconvenient rate, I many times ticked \"remember for future payments\" and still sets the wrong currency by default.\"*\n- *\"Then, check the time a few minutes later, you will notice that there is a discrepancy in the time that has passed since you placed the order and the actual delivery time.\"*\n- *\"They show you a certain time the food will reach in & then manipulate the time without you noticing.\"*\n\n### Action Ideas\n1. **Escalation Trigger for Missing Items:** Automatically route chat sessions to human agents when visual photo evidence of wrong or missing food is uploaded.\n2. **Dynamic Rider Radius Cap:** Restrict dispatch assignments to riders within a 3km radius of restaurants during dinner peak hours (7–10 PM).\n3. **Merchant Spill-Proof Seal Audits:** Mandate tamper-evident packaging badges for top spilled categories and penalize recurring leakages.",
+  "word_count": 243,
+  "quote_veracity_verified": true,
+  "pii_free_verified": true,
+  "tokens_consumed": 0,
+  "model_used": "deterministic-fallback"
+}

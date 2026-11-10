@@ -1,0 +1,29 @@
+{
+  "customer_support_bot": {
+    "name": "Customer Support & Chatbot Looping",
+    "candidate_quotes": [
+      "They always try to convert to another currency with inconvenient rate, I many times ticked \"remember for future payments\" and still sets the wrong currency by default.",
+      "The other day, tired of this, I cancelled the order and explained this very reason (wrong currency), and the transaction went through on its own!",
+      "The worst experience I had to wait for 1 hour and 45 mins for an order for a restaurant that is literally 3 mins away.",
+      "It kept on displaying 10 mins left for the last 1 hour."
+    ]
+  },
+  "delivery_delays_riders": {
+    "name": "Delivery Delays & Rider Operations",
+    "candidate_quotes": [
+      "Then, check the time a few minutes later, you will notice that there is a discrepancy in the time that has passed since you placed the order and the actual delivery time.",
+      "As an experiment, check the time you place the order & the delivery time they initially mention.",
+      "They show you a certain time the food will reach in & then manipulate the time without you noticing.",
+      "When a company tries to fool its customers every time they order, it speaks volumes about their ethics & values."
+    ]
+  },
+  "food_quality_packaging": {
+    "name": "Food Quality, Packaging Spills & Broken Seals",
+    "candidate_quotes": [
+      "They show you a certain time the food will reach in & then manipulate the time without you noticing.",
+      "As an experiment, check the time you place the order & the delivery time they initially mention.",
+      "Then, check the time a few minutes later, you will notice that there is a discrepancy in the time that has passed since you placed the order and the actual delivery time.",
+      "When a company tries to fool its customers every time they order, it speaks volumes about their ethics & values."
+    ]
+  }
+}

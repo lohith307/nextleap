@@ -1,0 +1,132 @@
+{
+  "customer_support_bot": [
+    {
+      "review_id": "ec41851c-7dc5-4e98-ab8b-0ae90afd8241",
+      "rating": 1,
+      "date": "2026-09-16",
+      "quote": "Very disappointing service. The app showed a 25-minute delivery time, but my order arrived after 65 minutes. I contacted Customer Care, but they didn\u2019t properly address my complaint. Please improve your delivery service and customer support."
+    },
+    {
+      "review_id": "5dbf9a02-1176-4e78-b840-01a9851de296",
+      "rating": 1,
+      "date": "2026-09-06",
+      "quote": "Don't give refunds when there is a mistake in order. There Ai chat assistant is the very worst experience in my life. They remove the offer while making payment & suddenly within the time the price rises in minutes by adding some charges."
+    },
+    {
+      "review_id": "ff9e0b61-6cad-4307-9169-2eb0027675ce",
+      "rating": 1,
+      "date": "2026-08-30",
+      "quote": "I ordered one thing, got sent something completely different, and when I tried to get help, I was just stuck talking in circles with a useless AI bot. Absolutely terrible customer service from Zomato. Never ordering from here again. Appreciate your business idotis....."
+    },
+    {
+      "review_id": "e6c04fa5-053f-46e9-9439-a474af61532a",
+      "rating": 1,
+      "date": "2026-09-17",
+      "quote": "my order was delayed by 2-3 hours and I couldn't cancel it hence my refund wasn't processed nor could I eat my food. It's a great application but there are some downsides which requires improvements."
+    }
+  ],
+  "delivery_delays_riders": [
+    {
+      "review_id": "ec41851c-7dc5-4e98-ab8b-0ae90afd8241",
+      "rating": 1,
+      "date": "2026-09-16",
+      "quote": "Very disappointing service. The app showed a 25-minute delivery time, but my order arrived after 65 minutes. I contacted Customer Care, but they didn\u2019t properly address my complaint. Please improve your delivery service and customer support."
+    },
+    {
+      "review_id": "5dbf9a02-1176-4e78-b840-01a9851de296",
+      "rating": 1,
+      "date": "2026-09-06",
+      "quote": "Don't give refunds when there is a mistake in order. There Ai chat assistant is the very worst experience in my life. They remove the offer while making payment & suddenly within the time the price rises in minutes by adding some charges."
+    },
+    {
+      "review_id": "77118278-8d76-491d-9f4c-c8c1c694eb33",
+      "rating": 1,
+      "date": "2026-09-05",
+      "quote": "Very disappointing experience. I placed my order at 8:45 PM, but even by 10:00 PM it was not delivered, and the delivery time kept getting delayed by another 20 minutes. Such delays are really frustrating."
+    },
+    {
+      "review_id": "cbdd737e-0272-440d-8ae7-2d9e5340bdb4",
+      "rating": 4,
+      "date": "2026-09-03",
+      "quote": "It is okay, but getting expensive. The platform is easy to use, and delivery is usually on time. However, the added platform fees, delivery charges, and surge pricing make ordering too expensive now."
+    }
+  ],
+  "payment_upi_glitches": [
+    {
+      "review_id": "ec41851c-7dc5-4e98-ab8b-0ae90afd8241",
+      "rating": 1,
+      "date": "2026-09-16",
+      "quote": "Very disappointing service. The app showed a 25-minute delivery time, but my order arrived after 65 minutes. I contacted Customer Care, but they didn\u2019t properly address my complaint. Please improve your delivery service and customer support."
+    },
+    {
+      "review_id": "5dbf9a02-1176-4e78-b840-01a9851de296",
+      "rating": 1,
+      "date": "2026-09-06",
+      "quote": "Don't give refunds when there is a mistake in order. There Ai chat assistant is the very worst experience in my life. They remove the offer while making payment & suddenly within the time the price rises in minutes by adding some charges."
+    },
+    {
+      "review_id": "85ceb4d2-76c5-4676-9ef8-c241ed3e6c40",
+      "rating": 5,
+      "date": "2026-09-10",
+      "quote": "I've been using this app for many years now. Absolute delight! The deals, the premium free everything is so reasonable. I rate it way higher than Swiggy or any other food delivery apps. Kudos to the team and the hardworking drivers :)"
+    },
+    {
+      "review_id": "0927c79f-fb11-4010-ba7d-cfc90aabb625",
+      "rating": 1,
+      "date": "2026-09-11",
+      "quote": "this had always been my go to app but recently orders are always late. the delivery partner always delivering another order on the way . even after raising multiple complaints with customer support the same problem continues. Very Disappointed"
+    }
+  ],
+  "pricing_gold_fees": [
+    {
+      "review_id": "5dbf9a02-1176-4e78-b840-01a9851de296",
+      "rating": 1,
+      "date": "2026-09-06",
+      "quote": "Don't give refunds when there is a mistake in order. There Ai chat assistant is the very worst experience in my life. They remove the offer while making payment & suddenly within the time the price rises in minutes by adding some charges."
+    },
+    {
+      "review_id": "cbdd737e-0272-440d-8ae7-2d9e5340bdb4",
+      "rating": 4,
+      "date": "2026-09-03",
+      "quote": "It is okay, but getting expensive. The platform is easy to use, and delivery is usually on time. However, the added platform fees, delivery charges, and surge pricing make ordering too expensive now."
+    },
+    {
+      "review_id": "31452d5f-0533-4999-b577-838835a9c74f",
+      "rating": 1,
+      "date": "2026-09-10",
+      "quote": "No refunds, food keeps getting delayed for hours, but if you want a refund they charge you a full cancellation fee. Really getting worse day by day, uninstalling this app and will be using other apps."
+    },
+    {
+      "review_id": "84cb1d75-9d67-490c-9578-b0ac2f1c776d",
+      "rating": 1,
+      "date": "2026-08-31",
+      "quote": "The charges are quite high, while the quantity provided is very less. Considering the price and quantity, it feels unfair and almost like a fraud. I would request you to review the pricing and portion size."
+    }
+  ],
+  "food_quality_packaging": [
+    {
+      "review_id": "e1c67fa0-64b6-4246-a7dd-fa178b57634c",
+      "rating": 1,
+      "date": "2026-09-07",
+      "quote": "worst customer service ever. For queries we can't able to speak with persons and always end up with inappropriate, unnecessary and useless automated messages. Still I didn't got any reply or refund for my missing food item."
+    },
+    {
+      "review_id": "8585bae2-a305-4c69-931e-3fd5b1e4afc2",
+      "rating": 1,
+      "date": "2026-09-04",
+      "quote": "I ordered food because I wanted to eat it hot and fresh. But with this kind of service, don\u2019t expect hot food\u2014be prepared for it to arrive cold. If you\u2019re looking for hot food, think twice before ordering. Extremely disappointing experience."
+    },
+    {
+      "review_id": "1f61394a-bba0-4260-be1e-7ef1d64543b2",
+      "rating": 1,
+      "date": "2026-09-07",
+      "quote": "When the restaurant sends the wrong item, their support team fails to verify even after watching the image of items. You have to bear the cost and either through the item or reorder."
+    },
+    {
+      "review_id": "123d9cad-d5b0-42e8-a4c2-3a422eb51076",
+      "rating": 1,
+      "date": "2026-08-25",
+      "quote": "They started a scam recently - There was an incident when we didn't receive the ordered item, the team replied to us sayung that they are keeping the money and do whatever you want after multiple followups. great work zomato."
+    }
+  ]
+}
