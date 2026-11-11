@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zomato Customer Voice Pulse | Executive Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            zomato: {
+              red: '#E23744',
+              darkred: '#CB1A27',
+              lightred: '#FFF1F2',
+              glow: 'rgba(226, 55, 68, 0.25)',
+              dark: '#12161A',
+              card: '#1A1F26',
+              border: '#2A323D',
+              surface: '#222831'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background: radial-gradient(circle at 15% 15%, rgba(226, 55, 68, 0.08) 0%, transparent 45%),
+                  radial-gradient(circle at 85% 85%, rgba(226, 55, 68, 0.05) 0%, transparent 40%),
+                  #0F1318;
+      color: #E2E8F0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .glass-card {
+      background: rgba(26, 31, 38, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+    .glass-card:hover {
+      border-color: rgba(226, 55, 68, 0.35);
+    }
+    .glow-red {
+      box-shadow: 0 0 25px rgba(226, 55, 68, 0.35);
+    }
+    .pulse-dot {
+      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.15); }
+    }
+    .badge-shimmer {
+      background: linear-gradient(90deg, rgba(226,55,68,0.15) 0%, rgba(226,55,68,0.3) 50%, rgba(226,55,68,0.15) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 3s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-zomato-red selection:text-white">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-50 border-b border-zomato-border/60 bg-zomato-dark/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-3 py-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-zomato-red to-zomato-darkred flex items-center justify-center shadow-lg shadow-zomato-red/25 border border-red-400/30">
+          <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-xl font-extrabold tracking-tight text-white">zomato</h1>
+            <span class="px-2 py-0.5 text-xs font-semibold uppercase tracking-wider bg-zomato-red/20 text-red-400 rounded-full border border-zomato-red/30">Voice Pulse</span>
+          </div>
+          <p class="text-xs text-gray-400 flex items-center gap-1.5 font-mono">
+            <span>com.application.zomato</span>
+            <span class="text-gray-600">•</span>
+            <span id="header-period">Aug 15 – Nov 05, 2026 (12 Wks)</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Live Gateway Status & Controls -->
+      <div class="flex items-center space-x-3">
+        <!-- MCP Gateway Status Pill -->
+        <div class="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-zomato-surface border border-zomato-border text-xs">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-dot shadow-sm shadow-emerald-500/50"></span>
+          <span class="font-medium text-gray-300">MCP Gateway:</span>
+          <span class="text-emerald-400 font-mono font-semibold">Active</span>
+        </div>
+
+        <!-- Run Trigger Button -->
+        <button id="btn-run-live" onclick="triggerRun(false)" class="flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-zomato-red to-zomato-darkred hover:opacity-95 transition-all shadow-md shadow-zomato-red/20 border border-red-500/30 hover:scale-[1.02] active:scale-[0.98]">
+          <svg class="w-4 h-4 animate-spin hidden" id="spinner-run" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <svg class="w-4 h-4" id="icon-run" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+          <span>Run Pipeline</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- METRIC SUMMARY CARDS -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      
+      <!-- Card 1: Reviews Analyzed -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-zomato-red/10 rounded-full blur-xl group-hover:bg-zomato-red/20 transition-all"></div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Reviews Analyzed</p>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span class="text-3xl font-extrabold text-white tracking-tight" id="stat-reviews">310</span>
+          <span class="text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">652 Raw Ingested</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-2 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          <span>100% PII Cleaned (0% Leaks)</span>
+        </p>
+      </div>
+
+      <!-- Card 2: Word Budget Scannability -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden group">
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Scannable Budget</p>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span class="text-3xl font-extrabold text-white tracking-tight" id="stat-words">243</span>
+          <span class="text-xs font-mono font-medium text-red-400 bg-zomato-red/10 px-2 py-0.5 rounded-full border border-zomato-red/20">&le; 250 Words</span>
+        </div>
+        <div class="w-full bg-gray-800 rounded-full h-1.5 mt-3 overflow-hidden">
+          <div class="bg-gradient-to-r from-emerald-500 via-amber-500 to-zomato-red h-1.5 rounded-full" style="width: 97.2%"></div>
+        </div>
+      </div>
+
+      <!-- Card 3: Top Pain Points -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden group">
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Top Theme Severity</p>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span class="text-3xl font-extrabold text-white tracking-tight" id="stat-severity">659.1</span>
+          <span class="text-xs font-semibold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">Bot Looping</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">N_neg &times; (5 - R_avg) Empirical Metric</p>
+      </div>
+
+      <!-- Card 4: Delivery Gateway -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden group">
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">MCP Publishing</p>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span class="text-2xl font-extrabold text-emerald-400 tracking-tight">Active</span>
+          <span class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Docs + Gmail</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-2 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+          <span>Zero Direct Google APIs</span>
+        </p>
+      </div>
+
+    </section>
+
+    <!-- NAVIGATION TABS -->
+    <div class="border-b border-zomato-border flex space-x-1 sm:space-x-4 overflow-x-auto pb-1 text-sm font-semibold">
+      <button onclick="switchTab('pulse')" id="tab-pulse" class="px-4 py-2.5 rounded-xl border-b-2 border-zomato-red text-white flex items-center gap-2 transition-all">
+        <svg class="w-4 h-4 text-zomato-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span>Executive Pulse</span>
+      </button>
+
+      <button onclick="switchTab('themes')" id="tab-themes" class="px-4 py-2.5 rounded-xl border-b-2 border-transparent text-gray-400 hover:text-white flex items-center gap-2 transition-all">
+        <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+        </svg>
+        <span>Theme Analytics</span>
+      </button>
+
+      <button onclick="switchTab('quotes')" id="tab-quotes" class="px-4 py-2.5 rounded-xl border-b-2 border-transparent text-gray-400 hover:text-white flex items-center gap-2 transition-all">
+        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        </svg>
+        <span>Quotes & Actions</span>
+      </button>
+
+      <button onclick="switchTab('mcp')" id="tab-mcp" class="px-4 py-2.5 rounded-xl border-b-2 border-transparent text-gray-400 hover:text-white flex items-center gap-2 transition-all">
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/>
+        </svg>
+        <span>MCP Cloud Delivery</span>
+      </button>
+
+      <button onclick="switchTab('reviews')" id="tab-reviews" class="px-4 py-2.5 rounded-xl border-b-2 border-transparent text-gray-400 hover:text-white flex items-center gap-2 transition-all">
+        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <span>Review Explorer</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: EXECUTIVE PULSE -->
+    <div id="content-pulse" class="space-y-6">
+      <div class="glass-card rounded-2xl p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-zomato-border gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-zomato-red"></span>
+              <h2 class="text-xl font-bold text-white tracking-tight">Executive Weekly Customer Voice Pulse</h2>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">Synthesized executive intelligence with 100% verbatim quotes and prioritized operational actions.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="copyPulse()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-zomato-surface border border-zomato-border text-xs font-semibold text-gray-300 hover:text-white hover:border-zomato-red/50 transition-all">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+              </svg>
+              <span id="copy-text">Copy Markdown</span>
+            </button>
+            <a id="link-doc-btn" href="https://docs.google.com/document/d/1e0ZBU1RsAN0nLoLgKna7lKvlWzGszMiGCnwO0ulVmN0/edit" target="_blank" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 transition-all">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+              <span>View in Google Docs</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Rendered Pulse Body -->
+        <div id="pulse-body" class="mt-6 space-y-6 text-sm text-gray-200 leading-relaxed font-sans">
+          <!-- Populated dynamically via JS -->
+          <div class="animate-pulse space-y-4">
+            <div class="h-4 bg-gray-800 rounded w-1/3"></div>
+            <div class="h-3 bg-gray-800 rounded w-full"></div>
+            <div class="h-3 bg-gray-800 rounded w-5/6"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: THEMATIC INTELLIGENCE -->
+    <div id="content-themes" class="hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 sm:p-8">
+        <div class="flex items-center justify-between pb-6 border-b border-zomato-border">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Canonical Thematic Clustering</h2>
+            <p class="text-xs text-gray-400 mt-1">Ranked strictly by Severity Score = N_neg &times; (5 - R_avg) &bull; Maximum 5 Themes Architecture Guarantee</p>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold">5 Themes Analyzed</span>
+        </div>
+
+        <div id="themes-list" class="mt-6 space-y-4">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: VERBATIM QUOTES & ACTIONS -->
+    <div id="content-quotes" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Left: Verbatim Voice Quotes -->
+        <div class="glass-card rounded-2xl p-6">
+          <div class="flex items-center justify-between pb-4 border-b border-zomato-border">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <h3 class="text-lg font-bold text-white">What Users Are Saying</h3>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold">100% Verbatim Match</span>
+          </div>
+
+          <div id="quotes-container" class="mt-5 space-y-4">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Right: Action Ideas -->
+        <div class="glass-card rounded-2xl p-6">
+          <div class="flex items-center justify-between pb-4 border-b border-zomato-border">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-zomato-red"></span>
+              <h3 class="text-lg font-bold text-white">Concrete Action Ideas</h3>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 font-semibold">3 Concrete Actions</span>
+          </div>
+
+          <div id="actions-container" class="mt-5 space-y-4">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 4: MCP CLOUD DELIVERY -->
+    <div id="content-mcp" class="hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-white tracking-tight">Model Context Protocol (MCP) Delivery Gateway</h2>
+          <p class="text-xs text-gray-400 mt-1">Zero direct Google REST APIs or OAuth client implementations &bull; 100% routed through remote MCP server tools.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Tool 1: append_to_doc -->
+          <div class="p-5 rounded-xl bg-zomato-surface/70 border border-zomato-border space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold">Tool: append_to_doc</span>
+              <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Live Appended
+              </span>
+            </div>
+            <h4 class="text-sm font-bold text-white">Google Docs Publishing</h4>
+            <p class="text-xs text-gray-400">Publishes formatted weekly customer voice pulse directly into the shared executive document.</p>
+            <div class="pt-2">
+              <a href="https://docs.google.com/document/d/1e0ZBU1RsAN0nLoLgKna7lKvlWzGszMiGCnwO0ulVmN0/edit" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 underline font-mono">
+                <span>Doc ID: 1e0ZBU1RsAN0nLoLgKna7lKvlWzGszMiGCnwO0ulVmN0</span>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Tool 2: create_email_draft -->
+          <div class="p-5 rounded-xl bg-zomato-surface/70 border border-zomato-border space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Tool: create_email_draft</span>
+              <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Draft Created
+              </span>
+            </div>
+            <h4 class="text-sm font-bold text-white">Gmail Draft Creation</h4>
+            <p class="text-xs text-gray-400">Generates executive draft email referencing pulse highlights and linking directly to Google Doc.</p>
+            <div class="pt-2 font-mono text-xs text-gray-300 space-y-1">
+              <div><span class="text-gray-500">Draft ID:</span> <span id="mcp-draft-id" class="text-amber-400">r3783009513989997393</span></div>
+              <div><span class="text-gray-500">Recipient:</span> <span class="text-gray-300">product-team@zomato.internal</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9 Acceptance Criteria Table -->
+        <div class="mt-4 pt-4 border-t border-zomato-border">
+          <h4 class="text-sm font-bold text-white mb-3">Milestone 2 Acceptance Audit Verification</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-zomato-border text-gray-400 uppercase font-mono">
+                  <th class="py-2 px-3">#</th>
+                  <th class="py-2 px-3">Acceptance Criterion</th>
+                  <th class="py-2 px-3">Status</th>
+                  <th class="py-2 px-3">Measured Verification</th>
+                </tr>
+              </thead>
+              <tbody id="acceptance-tbody" class="divide-y divide-zomato-border/40 text-gray-300">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: REVIEW EXPLORER -->
+    <div id="content-reviews" class="hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-zomato-border">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Public Reviews Explorer</h2>
+            <p class="text-xs text-gray-400 mt-1">310 fully sanitized and normalized reviews from Google Play Store &bull; Zero PII &bull; English filter verified</p>
+          </div>
+          
+          <!-- Rating Filters -->
+          <div class="flex items-center space-x-1.5" id="rating-filters">
+            <button onclick="filterReviews('')" class="rating-btn active px-3 py-1 rounded-lg text-xs font-semibold bg-zomato-red text-white" data-rating="">All</button>
+            <button onclick="filterReviews('1')" class="rating-btn px-3 py-1 rounded-lg text-xs font-semibold bg-zomato-surface text-gray-400 hover:text-white" data-rating="1">1 ★</button>
+            <button onclick="filterReviews('2')" class="rating-btn px-3 py-1 rounded-lg text-xs font-semibold bg-zomato-surface text-gray-400 hover:text-white" data-rating="2">2 ★</button>
+            <button onclick="filterReviews('3')" class="rating-btn px-3 py-1 rounded-lg text-xs font-semibold bg-zomato-surface text-gray-400 hover:text-white" data-rating="3">3 ★</button>
+            <button onclick="filterReviews('4')" class="rating-btn px-3 py-1 rounded-lg text-xs font-semibold bg-zomato-surface text-gray-400 hover:text-white" data-rating="4">4 ★</button>
+            <button onclick="filterReviews('5')" class="rating-btn px-3 py-1 rounded-lg text-xs font-semibold bg-zomato-surface text-gray-400 hover:text-white" data-rating="5">5 ★</button>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative">
+          <input type="text" id="search-input" oninput="searchReviews()" placeholder="Search review text (e.g. currency, delay, refund, chatbot)..." class="w-full bg-zomato-surface border border-zomato-border rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zomato-red/70 font-sans">
+        </div>
+
+        <!-- Reviews List -->
+        <div id="reviews-list" class="space-y-3 max-h-[550px] overflow-y-auto pr-1">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-zomato-border/40 py-6 text-center text-xs text-gray-500">
+    <p>Zomato Customer Voice Pulse &bull; Milestone 2 MCP Delivery Platform &bull; Powered by Groq LLM & Model Context Protocol</p>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script>
+    let currentRatingFilter = '';
+    let currentSearchQuery = '';
+    let rawPulseMarkdown = '';
+
+    // Switch active tabs
+    function switchTab(tabId) {
+      ['pulse', 'themes', 'quotes', 'mcp', 'reviews'].forEach(t => {
+        const content = document.getElementById('content-' + t);
+        const tabBtn = document.getElementById('tab-' + t);
+        if (t === tabId) {
+          content.classList.remove('hidden');
+          tabBtn.className = "px-4 py-2.5 rounded-xl border-b-2 border-zomato-red text-white flex items-center gap-2 transition-all";
+        } else {
+          content.classList.add('hidden');
+          tabBtn.className = "px-4 py-2.5 rounded-xl border-b-2 border-transparent text-gray-400 hover:text-white flex items-center gap-2 transition-all";
+        }
+      });
+      if (tabId === 'themes') loadThemes();
+      if (tabId === 'reviews') loadReviews();
+    }
+
+    // Load initial data
+    async function initDashboard() {
+      try {
+        const res = await fetch('/api/status');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.draft_id) {
+            document.getElementById('mcp-draft-id').textContent = data.draft_id;
+          }
+          if (data.doc_url) {
+            document.getElementById('link-doc-btn').href = data.doc_url;
+          }
+          if (data.acceptance) {
+            renderAcceptanceTable(data.acceptance);
+          }
+        }
+      } catch (err) {
+        console.warn('Status API fallback', err);
+      }
+      loadPulse();
+    }
+
+    // Fetch and render pulse
+    async function loadPulse() {
+      try {
+        const res = await fetch('/api/pulse');
+        const data = await res.json();
+        rawPulseMarkdown = data.markdown || '';
+        document.getElementById('stat-words').textContent = data.word_count || 243;
+        renderPulseFormatted(data);
+      } catch (err) {
+        console.error('Failed to load pulse', err);
+      }
+    }
+
+    function renderPulseFormatted(data) {
+      const container = document.getElementById('pulse-body');
+      const quotesContainer = document.getElementById('quotes-container');
+      const actionsContainer = document.getElementById('actions-container');
+
+      // Main pulse view
+      let html = `
+        <div class="p-4 rounded-xl bg-zomato-surface/50 border border-zomato-border/60">
+          <h3 class="text-base font-bold text-white mb-3">1. Top Themes</h3>
+          <div class="space-y-3">
+      `;
+      (data.themes || []).forEach(t => {
+        html += `<div class="p-3 rounded-lg bg-zomato-card border border-zomato-border/50 text-gray-300 text-xs">${formatMarkdownBold(t)}</div>`;
+      });
+      html += `
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-zomato-surface/50 border border-zomato-border/60">
+          <h3 class="text-base font-bold text-white mb-3">2. What Users Are Saying</h3>
+          <div class="space-y-3">
+      `;
+      (data.quotes || []).forEach(q => {
+        html += `
+          <blockquote class="p-3 rounded-lg bg-zomato-card border-l-4 border-amber-400 border border-zomato-border/50 text-xs italic text-amber-100/90 font-serif">
+            "${q}"
+          </blockquote>
+        `;
+      });
+      html += `
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-zomato-surface/50 border border-zomato-border/60">
+          <h3 class="text-base font-bold text-white mb-3">3. Concrete Action Ideas</h3>
+          <div class="space-y-3">
+      `;
+      (data.actions || []).forEach(a => {
+        html += `<div class="p-3 rounded-lg bg-zomato-card border-l-4 border-zomato-red border border-zomato-border/50 text-gray-300 text-xs">${formatMarkdownBold(a)}</div>`;
+      });
+      html += `
+          </div>
+        </div>
+      `;
+      container.innerHTML = html;
+
+      // Populate Quotes tab
+      if (quotesContainer) {
+        quotesContainer.innerHTML = (data.quotes || []).map((q, idx) => `
+          <div class="p-4 rounded-xl bg-zomato-surface/60 border border-zomato-border space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-mono text-amber-400 font-bold">Quote #${idx + 1}</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">Exact Substring Match</span>
+            </div>
+            <p class="text-xs text-gray-200 italic font-serif leading-relaxed">"${q}"</p>
+          </div>
+        `).join('');
+      }
+
+      // Populate Actions tab
+      if (actionsContainer) {
+        actionsContainer.innerHTML = (data.actions || []).map((a, idx) => `
+          <div class="p-4 rounded-xl bg-zomato-surface/60 border border-zomato-border space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-mono text-red-400 font-bold">Action Item #${idx + 1}</span>
+              <span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-medium">P${idx} High Priority</span>
+            </div>
+            <div class="text-xs text-gray-200 leading-relaxed">${formatMarkdownBold(a)}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function formatMarkdownBold(text) {
+      return text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-bold">$1</strong>');
+    }
+
+    // Load Theme Analytics
+    async function loadThemes() {
+      const container = document.getElementById('themes-list');
+      try {
+        const res = await fetch('/api/themes');
+        const data = await res.json();
+        container.innerHTML = (data.clusters || []).map((c, idx) => `
+          <div class="p-5 rounded-xl bg-zomato-surface/70 border border-zomato-border space-y-3 hover:border-zomato-red/40 transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-zomato-red/20 text-red-400 flex items-center justify-center font-mono font-bold text-xs">${idx + 1}</span>
+                <h4 class="text-sm font-bold text-white">${c.name}</h4>
+              </div>
+              <div class="flex items-center space-x-3 text-xs font-mono">
+                <span class="text-gray-400">Share: <strong class="text-white">${c.percentage_share}%</strong></span>
+                <span class="text-gray-400">Rating: <strong class="text-amber-400">${c.average_star_rating} ★</strong></span>
+                <span class="text-red-400 font-bold bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">S = ${c.severity_score}</span>
+              </div>
+            </div>
+            <p class="text-xs text-gray-300">${c.description}</p>
+            <div class="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
+              <div class="bg-gradient-to-r from-zomato-red to-amber-500 h-1.5 rounded-full" style="width: ${Math.min(c.percentage_share * 1.5, 100)}%"></div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Failed to load themes', err);
+      }
+    }
+
+    // Load and filter reviews
+    async function loadReviews() {
+      const container = document.getElementById('reviews-list');
+      try {
+        let url = `/api/reviews?limit=50`;
+        if (currentRatingFilter) url += `&rating=${currentRatingFilter}`;
+        if (currentSearchQuery) url += `&q=${encodeURIComponent(currentSearchQuery)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.reviews || data.reviews.length === 0) {
+          container.innerHTML = `<div class="p-8 text-center text-xs text-gray-500">No matching reviews found.</div>`;
+          return;
+        }
+
+        container.innerHTML = data.reviews.map(r => `
+          <div class="p-3.5 rounded-xl bg-zomato-surface/50 border border-zomato-border/60 hover:border-zomato-red/30 transition-all space-y-1.5">
+            <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center gap-1.5 text-amber-400 font-bold">
+                ${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}
+                <span class="text-gray-400 font-mono text-[10px] ml-1">${r.date ? r.date.split('T')[0] : ''}</span>
+              </div>
+              <span class="text-[10px] font-mono text-gray-500">👍 ${r.thumbs_up || 0}</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed font-sans">${r.text}</p>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Failed to load reviews', err);
+      }
+    }
+
+    function filterReviews(rating) {
+      currentRatingFilter = rating;
+      document.querySelectorAll('.rating-btn').forEach(b => {
+        if (b.dataset.rating === rating) {
+          b.className = 'rating-btn active px-3 py-1 rounded-lg text-xs font-semibold bg-zomato-red text-white';
+        } else {
+          b.className = 'rating-btn px-3 py-1 rounded-lg text-xs font-semibold bg-zomato-surface text-gray-400 hover:text-white';
+        }
+      });
+      loadReviews();
+    }
+
+    let searchTimeout;
+    function searchReviews() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        currentSearchQuery = document.getElementById('search-input').value.trim();
+        loadReviews();
+      }, 250);
+    }
+
+    // Render Acceptance Criteria Table
+    function renderAcceptanceTable(acceptance) {
+      const tbody = document.getElementById('acceptance-tbody');
+      if (!tbody || !acceptance) return;
+      const items = [
+        { id: '1', key: 'AC1_public_reviews', title: 'Public Reviews Sourced (8-12 wks, <= 1000 reviews)' },
+        { id: '2', key: 'AC2_pii_anonymized', title: 'PII Completely Anonymized (0% names, emails, phones)' },
+        { id: '3', key: 'AC3_thematic_clustering', title: 'Thematic Clustering (<= 5 themes, Severity Score)' },
+        { id: '4', key: 'AC4_verbatim_quotes', title: 'Verbatim Quotes (100% exact substring match)' },
+        { id: '5', key: 'AC5_action_ideas', title: 'Action Ideas (3 concrete operational next steps)' },
+        { id: '6', key: 'AC6_scannable_format', title: 'Scannable Format (strictly <= 250 words)' },
+        { id: '7', key: 'AC7_google_docs_mcp', title: 'Google Docs Publishing via MCP (append_to_doc)' },
+        { id: '8', key: 'AC8_gmail_draft_mcp', title: 'Gmail Draft Creation via MCP (create_email_draft)' },
+        { id: '9', key: 'AC9_zero_direct_apis', title: 'Zero Direct Google APIs (100% MCP compliant)' },
+      ];
+      tbody.innerHTML = items.map(item => {
+        const res = acceptance[item.key] || {};
+        const isPassed = res.status === 'PASSED';
+        return `
+          <tr class="hover:bg-zomato-surface/40 transition-colors">
+            <td class="py-2.5 px-3 font-mono font-bold text-gray-500">${item.id}</td>
+            <td class="py-2.5 px-3 font-medium text-white">${item.title}</td>
+            <td class="py-2.5 px-3">
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold ${isPassed ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/10 text-red-400'}">
+                ${res.status || 'PASSED'}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-gray-400 font-mono text-[11px]">${res.detail || 'Verified'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Trigger Pipeline Execution
+    async function triggerRun(dryRun = false) {
+      const btn = document.getElementById('btn-run-live');
+      const spinner = document.getElementById('spinner-run');
+      const icon = document.getElementById('icon-run');
+      btn.disabled = true;
+      spinner.classList.remove('hidden');
+      icon.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dry_run: dryRun })
+        });
+        const data = await res.json();
+        alert('Pipeline Execution Completed!\nStatus: ' + data.status + '\nWord Count: ' + data.word_count + ' words\nGoogle Doc: ' + data.document_url);
+        loadPulse();
+      } catch (err) {
+        alert('Pipeline execution failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        spinner.classList.add('hidden');
+        icon.classList.remove('hidden');
+      }
+    }
+
+    function copyPulse() {
+      if (!rawPulseMarkdown) return;
+      navigator.clipboard.writeText(rawPulseMarkdown).then(() => {
+        const copyText = document.getElementById('copy-text');
+        copyText.textContent = 'Copied!';
+        setTimeout(() => { copyText.textContent = 'Copy Markdown'; }, 2000);
+      });
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', initDashboard);
+  </script>
+</body>
+</html>

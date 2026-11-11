@@ -127,7 +127,17 @@ python run_phase3.py   # Groq LLM pulse synthesis & verbatim verification
 python run_phase4.py   # Remote MCP tool discovery & Workspace adapter publishing
 python run_phase5.py   # Full master orchestrator pipeline & telemetry audit
 python run_phase6.py   # Quality, security & constraint hardening audit
+python run_phase7.py   # Milestone verification & 9-point formal acceptance audit
 ```
+
+### 5.5 Interactive Web Dashboard
+```powershell
+# Launches the vibrant executive dashboard on http://localhost:8000
+python run_ui.py
+# Or specify a custom port:
+python run_ui.py 8080
+```
+
 
 ---
 

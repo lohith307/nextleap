@@ -130,6 +130,15 @@ python run_phase6.py   # Quality, security & constraint hardening audit
 python run_phase7.py   # Milestone verification & 9-point formal acceptance audit
 ```
 
+### 5.5 Interactive Web Dashboard
+```powershell
+# Launches the vibrant executive dashboard on http://localhost:8000
+python run_ui.py
+# Or specify a custom port:
+python run_ui.py 8080
+```
+
+
 ---
 
 ## 6. Test Suite Verification
