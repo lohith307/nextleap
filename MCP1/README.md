@@ -127,57 +127,68 @@ python run_phase3.py   # Groq LLM pulse synthesis & verbatim verification
 python run_phase4.py   # Remote MCP tool discovery & Workspace adapter publishing
 python run_phase5.py   # Full master orchestrator pipeline & telemetry audit
 python run_phase6.py   # Quality, security & constraint hardening audit
+python run_phase7.py   # Milestone verification & 9-point formal acceptance audit
 ```
 
 ---
 
 ## 6. Test Suite Verification
 
-Run the entire test suite covering unit, integration, and static invariant checks:
+Run the entire test suite covering unit, integration, hardening, and acceptance checks:
 ```powershell
 python -m pytest tests/ -v
 ```
 
 Output:
 ```text
-tests/test_clustering.py::test_canonical_theme_count PASSED              [  2%]
-tests/test_clustering.py::test_classifier_pattern_matching PASSED        [  5%]
-tests/test_clustering.py::test_clustering_on_real_sanitized_dataset PASSED [  8%]
-tests/test_clustering.py::test_groq_rate_limiter_pacing PASSED           [ 11%]
-tests/test_mcp_client.py::test_mcp_handshake_and_tools_list PASSED       [ 13%]
-tests/test_mcp_client.py::test_get_tools_schema_definitions PASSED       [ 16%]
-tests/test_mcp_client.py::test_google_docs_mcp_adapter PASSED            [ 19%]
-tests/test_mcp_client.py::test_gmail_mcp_adapter PASSED                  [ 22%]
-tests/test_mcp_client.py::test_gmail_adapter_uses_env_recipient PASSED   [ 25%]
-tests/test_mcp_client.py::test_remote_http_mcp_client_tools PASSED       [ 27%]
-tests/test_mcp_client.py::test_zero_direct_rest_apis_check PASSED        [ 30%]
-tests/test_pipeline.py::test_pipeline_dry_run PASSED                     [ 33%]
-tests/test_pipeline.py::test_pipeline_live_mcp_run PASSED                [ 36%]
-tests/test_pipeline.py::test_pipeline_custom_doc_id PASSED               [ 38%]
-tests/test_pipeline.py::test_main_cli_dry_run PASSED                     [ 41%]
-tests/test_sanitization.py::test_sanitize_emails PASSED                  [ 44%]
-tests/test_sanitization.py::test_sanitize_phone_numbers PASSED           [ 47%]
-tests/test_sanitization.py::test_sanitize_order_ids PASSED               [ 50%]
-tests/test_sanitization.py::test_sanitize_user_mentions PASSED           [ 52%]
-tests/test_sanitization.py::test_sanitize_rider_names PASSED             [ 55%]
-tests/test_sanitization.py::test_emoji_removal PASSED                    [ 58%]
-tests/test_sanitization.py::test_short_reviews_dropped PASSED            [ 61%]
-tests/test_sanitization.py::test_language_filtering PASSED               [ 63%]
-tests/test_verifier.py::test_quote_veracity_exact_match PASSED           [ 66%]
-tests/test_verifier.py::test_verifier_replaces_hallucinated_quote PASSED [ 69%]
-tests/test_verifier.py::test_word_budget_counter_and_enforcer PASSED     [ 72%]
-tests/test_verifier.py::test_pii_scanner PASSED                          [ 75%]
-tests/test_verifier.py::test_end_to_end_synthesis_deliverables PASSED    [ 77%]
-tests/test_hardening.py::test_pii_audit_full_processed_dataset PASSED    [ 80%]
-tests/test_hardening.py::test_adversarial_pii_sanitization PASSED        [ 83%]
-tests/test_hardening.py::test_word_budget_5_diverse_batches PASSED       [ 86%]
-tests/test_hardening.py::test_quote_veracity_complex_punctuation PASSED  [ 88%]
-tests/test_hardening.py::test_hallucination_deterministic_replacement PASSED [ 91%]
-tests/test_hardening.py::test_mcp_client_exponential_backoff_retry PASSED [ 94%]
+tests/test_acceptance.py::test_acceptance_criterion_1_public_reviews_sourced PASSED [  2%]
+tests/test_acceptance.py::test_acceptance_criterion_2_pii_completely_anonymized PASSED [  4%]
+tests/test_acceptance.py::test_acceptance_criterion_3_thematic_clustering_severity PASSED [  6%]
+tests/test_acceptance.py::test_acceptance_criterion_4_verbatim_quotes PASSED [  8%]
+tests/test_acceptance.py::test_acceptance_criterion_5_action_ideas PASSED [ 11%]
+tests/test_acceptance.py::test_acceptance_criterion_6_scannable_format_and_budget PASSED [ 13%]
+tests/test_acceptance.py::test_acceptance_criterion_7_google_docs_via_mcp PASSED [ 15%]
+tests/test_acceptance.py::test_acceptance_criterion_8_gmail_draft_via_mcp PASSED [ 17%]
+tests/test_acceptance.py::test_acceptance_criterion_9_zero_direct_google_apis PASSED [ 20%]
+tests/test_clustering.py::test_canonical_theme_count PASSED              [ 22%]
+tests/test_clustering.py::test_classifier_pattern_matching PASSED        [ 24%]
+tests/test_clustering.py::test_clustering_on_real_sanitized_dataset PASSED [ 26%]
+tests/test_clustering.py::test_groq_rate_limiter_pacing PASSED           [ 28%]
+tests/test_mcp_client.py::test_mcp_handshake_and_tools_list PASSED       [ 31%]
+tests/test_mcp_client.py::test_get_tools_schema_definitions PASSED       [ 33%]
+tests/test_mcp_client.py::test_google_docs_mcp_adapter PASSED            [ 35%]
+tests/test_mcp_client.py::test_gmail_mcp_adapter PASSED                  [ 37%]
+tests/test_mcp_client.py::test_gmail_adapter_uses_env_recipient PASSED   [ 40%]
+tests/test_mcp_client.py::test_remote_http_mcp_client_tools PASSED       [ 42%]
+tests/test_mcp_client.py::test_zero_direct_rest_apis_check PASSED        [ 44%]
+tests/test_pipeline.py::test_pipeline_dry_run PASSED                     [ 46%]
+tests/test_pipeline.py::test_pipeline_live_mcp_run PASSED                [ 48%]
+tests/test_pipeline.py::test_pipeline_custom_doc_id PASSED               [ 51%]
+tests/test_pipeline.py::test_main_cli_dry_run PASSED                     [ 53%]
+tests/test_sanitization.py::test_sanitize_emails PASSED                  [ 55%]
+tests/test_sanitization.py::test_sanitize_phone_numbers PASSED           [ 57%]
+tests/test_sanitization.py::test_sanitize_order_ids PASSED               [ 60%]
+tests/test_sanitization.py::test_sanitize_user_mentions PASSED           [ 62%]
+tests/test_sanitization.py::test_sanitize_rider_names PASSED             [ 64%]
+tests/test_sanitization.py::test_emoji_removal PASSED                    [ 66%]
+tests/test_sanitization.py::test_short_reviews_dropped PASSED            [ 68%]
+tests/test_sanitization.py::test_language_filtering PASSED               [ 71%]
+tests/test_verifier.py::test_quote_veracity_exact_match PASSED           [ 73%]
+tests/test_verifier.py::test_verifier_replaces_hallucinated_quote PASSED [ 75%]
+tests/test_verifier.py::test_word_budget_counter_and_enforcer PASSED     [ 77%]
+tests/test_verifier.py::test_pii_scanner PASSED                          [ 80%]
+tests/test_verifier.py::test_end_to_end_synthesis_deliverables PASSED    [ 82%]
+tests/test_hardening.py::test_pii_audit_full_processed_dataset PASSED    [ 84%]
+tests/test_hardening.py::test_adversarial_pii_sanitization PASSED        [ 86%]
+tests/test_hardening.py::test_word_budget_5_diverse_batches PASSED       [ 88%]
+tests/test_hardening.py::test_quote_veracity_complex_punctuation PASSED  [ 91%]
+tests/test_hardening.py::test_hallucination_deterministic_replacement PASSED [ 93%]
+tests/test_hardening.py::test_mcp_client_exponential_backoff_retry PASSED [ 95%]
 tests/test_hardening.py::test_mcp_client_graceful_fallback_after_max_retries PASSED [ 97%]
 tests/test_hardening.py::test_google_docs_adapter_local_backup_on_failure PASSED [100%]
 
-============================= 36 passed in 25.41s =============================
+============================= 45 passed in 46.04s =============================
+
 ```
 
 ---

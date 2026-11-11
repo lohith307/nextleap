@@ -93,3 +93,14 @@ def load_sanitized_reviews(path: Path = DEFAULT_PROCESSED_FILE) -> Optional[List
 def save_sanitized_reviews(reviews: List[SanitizedReview], path: Path = DEFAULT_PROCESSED_FILE) -> None:
     """Convenience function to save sanitized reviews to cache."""
     ReviewCache.save_sanitized(reviews, path)
+
+
+def load_raw_reviews(path: Path = DEFAULT_RAW_FILE) -> Optional[List[RawReview]]:
+    """Convenience function to load raw reviews from cache."""
+    return ReviewCache.load_raw(path)
+
+
+def save_raw_reviews(reviews: List[RawReview], path: Path = DEFAULT_RAW_FILE) -> None:
+    """Convenience function to save raw reviews to cache."""
+    ReviewCache.save_raw(reviews, path)
+

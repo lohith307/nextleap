@@ -347,3 +347,4 @@ def test_google_docs_adapter_local_backup_on_failure(tmp_path, monkeypatch):
     assert backup_path.exists(), "Local backup must exist even when MCP publishing fails!"
     assert test_pulse in backup_path.read_text(encoding="utf-8")
     assert res["status"] == "local_fallback"
+

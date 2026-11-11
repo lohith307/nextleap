@@ -1,0 +1,61 @@
+{
+  "timestamp": "2026-11-11T09:54:24.688007",
+  "pipeline_status": "SUCCESS",
+  "document_url": "https://docs.google.com/document/d/1e0ZBU1RsAN0nLoLgKna7lKvlWzGszMiGCnwO0ulVmN0/edit",
+  "draft_id": "r1025115988379798091",
+  "criteria_results": {
+    "AC1_public_reviews": {
+      "status": "PASSED",
+      "raw_reviews_count": 652,
+      "sanitized_reviews_count": 310,
+      "span_days": 82,
+      "detail": "652 raw reviews, 310 sanitized across 82 days (~11 weeks)"
+    },
+    "AC2_pii_anonymized": {
+      "status": "PASSED",
+      "emoji_leaks": 0,
+      "email_leaks": 0,
+      "phone_leaks": 0,
+      "detail": "0% PII detected (zero emails, phone numbers, order IDs, or emojis)"
+    },
+    "AC3_thematic_clustering": {
+      "status": "PASSED",
+      "total_clusters": 5,
+      "top_3_themes": "Customer Support & Chatbot Looping (S=659.1), Delivery Delays & Rider Operations (S=611.2), Food Quality, Packaging Spills & Broken Seals (S=468.5)",
+      "detail": "5 canonical themes, Top 3 prioritized by Severity Score: Customer Support & Chatbot Looping (S=659.1), Delivery Delays & Rider Operations (S=611.2), Food Quality, Packaging Spills & Broken Seals (S=468.5)"
+    },
+    "AC4_verbatim_quotes": {
+      "status": "PASSED",
+      "quotes_count": 3,
+      "exact_matches": "3 / 3",
+      "detail": "Exactly 3 quotes verified as 100% exact substring matches in corpus"
+    },
+    "AC5_action_ideas": {
+      "status": "PASSED",
+      "action_ideas_count": 3,
+      "detail": "Exactly 3 concrete, realistic next steps grounded in Top 3 themes"
+    },
+    "AC6_scannable_format": {
+      "status": "PASSED",
+      "word_count": 243,
+      "limit": "<= 250 words",
+      "detail": "243 words (strictly <= 250 words) with clear executive sections"
+    },
+    "AC7_google_docs_mcp": {
+      "status": "PASSED",
+      "document_url": "https://docs.google.com/document/d/1e0ZBU1RsAN0nLoLgKna7lKvlWzGszMiGCnwO0ulVmN0/edit",
+      "detail": "Appended via MCP append_to_doc/create_document to https://docs.google.com/document/d/1e0ZBU1RsAN0nLoLgKna7lKvlWzGszMiGCnwO0ulVmN0/edit"
+    },
+    "AC8_gmail_draft_mcp": {
+      "status": "PASSED",
+      "draft_id": "r1025115988379798091",
+      "recipient": "product-team@zomato.internal",
+      "detail": "Created via MCP create_email_draft (Draft ID: r1025115988379798091) for product-team@zomato.internal"
+    },
+    "AC9_zero_direct_apis": {
+      "status": "PASSED",
+      "violations": [],
+      "detail": "0 direct Google API imports or REST calls (100% routed through MCP servers)"
+    }
+  }
+}
