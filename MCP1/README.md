@@ -126,6 +126,7 @@ python run_phase2.py   # Thematic clustering & empirical severity ranking
 python run_phase3.py   # Groq LLM pulse synthesis & verbatim verification
 python run_phase4.py   # Remote MCP tool discovery & Workspace adapter publishing
 python run_phase5.py   # Full master orchestrator pipeline & telemetry audit
+python run_phase6.py   # Quality, security & constraint hardening audit
 ```
 
 ---
@@ -139,36 +140,44 @@ python -m pytest tests/ -v
 
 Output:
 ```text
-tests/test_clustering.py::test_canonical_theme_count PASSED              [  3%]
-tests/test_clustering.py::test_classifier_pattern_matching PASSED        [  7%]
-tests/test_clustering.py::test_clustering_on_real_sanitized_dataset PASSED [ 10%]
-tests/test_clustering.py::test_groq_rate_limiter_pacing PASSED           [ 14%]
-tests/test_mcp_client.py::test_mcp_handshake_and_tools_list PASSED       [ 17%]
-tests/test_mcp_client.py::test_get_tools_schema_definitions PASSED       [ 21%]
-tests/test_mcp_client.py::test_google_docs_mcp_adapter PASSED            [ 25%]
-tests/test_mcp_client.py::test_gmail_mcp_adapter PASSED                  [ 28%]
-tests/test_mcp_client.py::test_gmail_adapter_uses_env_recipient PASSED   [ 32%]
-tests/test_mcp_client.py::test_remote_http_mcp_client_tools PASSED       [ 35%]
-tests/test_mcp_client.py::test_zero_direct_rest_apis_check PASSED        [ 39%]
-tests/test_pipeline.py::test_pipeline_dry_run PASSED                     [ 42%]
-tests/test_pipeline.py::test_pipeline_live_mcp_run PASSED                [ 46%]
-tests/test_pipeline.py::test_pipeline_custom_doc_id PASSED               [ 50%]
-tests/test_pipeline.py::test_main_cli_dry_run PASSED                     [ 53%]
-tests/test_sanitization.py::test_sanitize_emails PASSED                  [ 57%]
-tests/test_sanitization.py::test_sanitize_phone_numbers PASSED           [ 60%]
-tests/test_sanitization.py::test_sanitize_order_ids PASSED               [ 64%]
-tests/test_sanitization.py::test_sanitize_user_mentions PASSED           [ 67%]
-tests/test_sanitization.py::test_sanitize_rider_names PASSED             [ 71%]
-tests/test_sanitization.py::test_emoji_removal PASSED                    [ 75%]
-tests/test_sanitization.py::test_short_reviews_dropped PASSED            [ 78%]
-tests/test_sanitization.py::test_language_filtering PASSED               [ 82%]
-tests/test_verifier.py::test_quote_veracity_exact_match PASSED           [ 85%]
-tests/test_verifier.py::test_verifier_replaces_hallucinated_quote PASSED [ 89%]
-tests/test_verifier.py::test_word_budget_counter_and_enforcer PASSED     [ 92%]
-tests/test_verifier.py::test_pii_scanner PASSED                          [ 96%]
-tests/test_verifier.py::test_end_to_end_synthesis_deliverables PASSED    [100%]
+tests/test_clustering.py::test_canonical_theme_count PASSED              [  2%]
+tests/test_clustering.py::test_classifier_pattern_matching PASSED        [  5%]
+tests/test_clustering.py::test_clustering_on_real_sanitized_dataset PASSED [  8%]
+tests/test_clustering.py::test_groq_rate_limiter_pacing PASSED           [ 11%]
+tests/test_mcp_client.py::test_mcp_handshake_and_tools_list PASSED       [ 13%]
+tests/test_mcp_client.py::test_get_tools_schema_definitions PASSED       [ 16%]
+tests/test_mcp_client.py::test_google_docs_mcp_adapter PASSED            [ 19%]
+tests/test_mcp_client.py::test_gmail_mcp_adapter PASSED                  [ 22%]
+tests/test_mcp_client.py::test_gmail_adapter_uses_env_recipient PASSED   [ 25%]
+tests/test_mcp_client.py::test_remote_http_mcp_client_tools PASSED       [ 27%]
+tests/test_mcp_client.py::test_zero_direct_rest_apis_check PASSED        [ 30%]
+tests/test_pipeline.py::test_pipeline_dry_run PASSED                     [ 33%]
+tests/test_pipeline.py::test_pipeline_live_mcp_run PASSED                [ 36%]
+tests/test_pipeline.py::test_pipeline_custom_doc_id PASSED               [ 38%]
+tests/test_pipeline.py::test_main_cli_dry_run PASSED                     [ 41%]
+tests/test_sanitization.py::test_sanitize_emails PASSED                  [ 44%]
+tests/test_sanitization.py::test_sanitize_phone_numbers PASSED           [ 47%]
+tests/test_sanitization.py::test_sanitize_order_ids PASSED               [ 50%]
+tests/test_sanitization.py::test_sanitize_user_mentions PASSED           [ 52%]
+tests/test_sanitization.py::test_sanitize_rider_names PASSED             [ 55%]
+tests/test_sanitization.py::test_emoji_removal PASSED                    [ 58%]
+tests/test_sanitization.py::test_short_reviews_dropped PASSED            [ 61%]
+tests/test_sanitization.py::test_language_filtering PASSED               [ 63%]
+tests/test_verifier.py::test_quote_veracity_exact_match PASSED           [ 66%]
+tests/test_verifier.py::test_verifier_replaces_hallucinated_quote PASSED [ 69%]
+tests/test_verifier.py::test_word_budget_counter_and_enforcer PASSED     [ 72%]
+tests/test_verifier.py::test_pii_scanner PASSED                          [ 75%]
+tests/test_verifier.py::test_end_to_end_synthesis_deliverables PASSED    [ 77%]
+tests/test_hardening.py::test_pii_audit_full_processed_dataset PASSED    [ 80%]
+tests/test_hardening.py::test_adversarial_pii_sanitization PASSED        [ 83%]
+tests/test_hardening.py::test_word_budget_5_diverse_batches PASSED       [ 86%]
+tests/test_hardening.py::test_quote_veracity_complex_punctuation PASSED  [ 88%]
+tests/test_hardening.py::test_hallucination_deterministic_replacement PASSED [ 91%]
+tests/test_hardening.py::test_mcp_client_exponential_backoff_retry PASSED [ 94%]
+tests/test_hardening.py::test_mcp_client_graceful_fallback_after_max_retries PASSED [ 97%]
+tests/test_hardening.py::test_google_docs_adapter_local_backup_on_failure PASSED [100%]
 
-============================= 28 passed in 58.42s =============================
+============================= 36 passed in 25.41s =============================
 ```
 
 ---
@@ -188,7 +197,8 @@ MCP1/
 │       ├── phase-02/            # Thematic taxonomy, severity ranking results
 │       ├── phase-03/            # Veracity verification, word budget enforcement
 │       ├── phase-04/            # GET /tools schemas, remote MCP client adapters
-│       └── phase-05/            # End-to-end master orchestrator pipeline
+│       ├── phase-05/            # End-to-end master orchestrator pipeline
+│       └── phase-06/            # Quality, security & constraint hardening audit
 ├── config/
 │   └── mcp_servers.json         # MCP server registry configuration
 ├── data/
@@ -204,6 +214,7 @@ MCP1/
 ├── tests/
 │   ├── mock_mcp_server.py       # Standalone JSON-RPC 2.0 stdio MCP server for tests
 │   ├── test_clustering.py       # Thematic clustering & Groq rate limiter tests
+│   ├── test_hardening.py        # Quality, security & constraint hardening tests
 │   ├── test_mcp_client.py       # MCP handshake, tool schemas, and zero REST API checks
 │   ├── test_pipeline.py         # End-to-end dry-run and live MCP publishing tests
 │   ├── test_sanitization.py     # PII, emoji, word count, and language filter tests
@@ -216,5 +227,7 @@ MCP1/
 ├── run_phase2.py                # Phase 2 runner
 ├── run_phase3.py                # Phase 3 runner
 ├── run_phase4.py                # Phase 4 runner
-└── run_phase5.py                # Phase 5 runner
+├── run_phase5.py                # Phase 5 runner
+└── run_phase6.py                # Phase 6 runner
 ```
+

@@ -65,6 +65,14 @@ class GmailAdapter:
                 "subject": target_subject,
                 "raw_result": result
             }
+        except Exception as e:
+            return {
+                "draft_id": "draft_local_fallback",
+                "status": "local_fallback",
+                "recipient": target_recipient,
+                "subject": target_subject,
+                "error": str(e)
+            }
         finally:
             if owns_client:
                 client.close()

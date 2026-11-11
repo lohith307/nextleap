@@ -63,7 +63,18 @@ class GoogleDocsAdapter:
                 "document_id": doc_id_res,
                 "document_url": doc_url,
                 "local_backup_path": str(LOCAL_BACKUP_PATH),
-                "raw_result": result
+                "raw_result": result,
+                "status": result.get("status", "success")
+            }
+        except Exception as e:
+            # Fallback when MCP fails: work is preserved locally at LOCAL_BACKUP_PATH
+            doc_id_res = target_doc_id or "doc_fallback"
+            return {
+                "document_id": doc_id_res,
+                "document_url": f"https://docs.google.com/document/d/{doc_id_res}/edit",
+                "local_backup_path": str(LOCAL_BACKUP_PATH),
+                "status": "local_fallback",
+                "error": str(e)
             }
         finally:
             if owns_client:

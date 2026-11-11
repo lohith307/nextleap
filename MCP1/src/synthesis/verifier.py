@@ -92,12 +92,17 @@ class PulseVerifier:
         """
         violations: List[str] = []
 
-        # Check for email addresses
-        if re.search(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", text):
+        # Check for email addresses (standard and obfuscated)
+        if re.search(
+            r"\b[A-Za-z0-9._%+-]+(?:\s*@\s*|\s*\[at\]\s*|\s*\(at\)\s*)[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+            r"|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+            text,
+            re.IGNORECASE
+        ):
             violations.append("Email address detected in pulse text")
 
-        # Check for unredacted phone numbers
-        if re.search(r"(?:\+91[-\s]?)?[6-9]\d{9}\b", text):
+        # Check for unredacted phone numbers (10 digits with optional prefix or 5-5 split)
+        if re.search(r"(?:\+91[-\s]?)?[6-9]\d{9}\b|\b[6-9]\d{4}[-\s]\d{5}\b", text):
             violations.append("Phone number detected in pulse text")
 
         # Check for handles
@@ -105,7 +110,7 @@ class PulseVerifier:
             violations.append("User mention handle detected in pulse text")
 
         # Check for order IDs
-        if re.search(r"\b(?:ZOM-|\bORD-|\bOD-)\d+\b", text, re.IGNORECASE):
+        if re.search(r"\b(?:ZOM|ORD|OD|TXN|TRX)[-_]?\d+\b|\border\s*(?:id|#)\s*[:#-]?\s*\d+\b", text, re.IGNORECASE):
             violations.append("Order ID detected in pulse text")
 
         return len(violations) == 0, violations

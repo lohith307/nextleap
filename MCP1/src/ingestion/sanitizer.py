@@ -26,21 +26,23 @@ class PIISanitizer:
         r"[\p{Extended_Pictographic}\p{Emoji_Presentation}]"
     )
 
-    # Email pattern
+    # Email pattern (standard and obfuscated: user [at] domain dot com, user(at)domain.com, user at domain dot com)
     EMAIL_REGEX = re.compile(
-        r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", re.IGNORECASE
-    )
-
-    # Phone numbers (Indian mobile formats: +91, 0, 10 digits, spaced or hyphenated)
-    PHONE_REGEX = re.compile(
-        r"(?:\+?91[\-\s]?)?[6-9]\d{9}|(?:\+?\d{1,3}[\-\s]?)?\(?\d{3}\)?[\-\s]?\d{3}[\-\s]?\d{4}",
+        r"[a-zA-Z0-9_.+-]+(?:\s*@\s*|\s*\[at\]\s*|\s*\(at\)\s*|\s+at\s+)[a-zA-Z0-9-]+(?:\s*\.\s*|\s*\(dot\)\s*|\s*\[dot\]\s*|\s+dot\s+)[a-zA-Z0-9-.]+"
+        r"|[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+",
         re.IGNORECASE,
     )
 
-    # Order IDs / Tracking / Transaction IDs (e.g., Order #12345, Order ID: 99812, #ZOM-12345)
+    # Phone numbers (Indian mobile formats: +91, 0, 10 digits, spaced or hyphenated, 5-5 split)
+    PHONE_REGEX = re.compile(
+        r"(?:\+?91[\-\s]?)?[6-9]\d{9}|(?:\+?\d{1,3}[\-\s]?)?\(?\d{3}\)?[\-\s]?\d{3}[\-\s]?\d{4}|\b[6-9]\d{4}[\-\s]\d{5}\b",
+        re.IGNORECASE,
+    )
+
+    # Order IDs / Tracking / Transaction IDs (e.g., Order #12345, Order ID: 99812, #ZOM-12345, OD12345678)
     ORDER_ID_REGEX = re.compile(
         r"(?:order\s*(?:id|no|number|#)\s*[:#-]?\s*[A-Za-z0-9\-_]{3,20})"
-        r"|(?:\b(?:ZOM|ORD|TXN|TRX)[-_][A-Za-z0-9]{3,15}\b)"
+        r"|(?:\b(?:ZOM|ORD|TXN|TRX|OD)[-_]?[A-Za-z0-9]{3,15}\b)"
         r"|(?:#\d{4,12}\b)",
         re.IGNORECASE,
     )

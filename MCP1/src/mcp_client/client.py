@@ -186,12 +186,21 @@ class RemoteHttpMCPClient:
     - GET /tools
     - POST /append_to_doc
     - POST /create_email_draft
+
+    Hardened with exponential backoff retry logic (up to 3 attempts) for network resilience.
     """
 
-    def __init__(self, base_url: str):
+    def __init__(
+        self,
+        base_url: str,
+        max_retries: int = 3,
+        backoff_factor: float = 0.5
+    ):
         self.base_url = base_url.rstrip("/")
         if not self.base_url.startswith("http"):
             self.base_url = f"https://{self.base_url}"
+        self.max_retries = max_retries
+        self.backoff_factor = backoff_factor
 
     def start(self) -> None:
         pass
@@ -199,14 +208,55 @@ class RemoteHttpMCPClient:
     def close(self) -> None:
         pass
 
+    def _request_with_retry(self, method: str, url: str, **kwargs) -> Any:
+        """
+        Executes HTTP request with exponential backoff retry logic (up to max_retries).
+        Retries on connection errors, timeouts, and HTTP 5xx responses.
+        """
+        import time
+        import requests
+
+        last_resp = None
+        last_exception = None
+
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                resp = requests.request(method, url, **kwargs)
+                last_resp = resp
+
+                # If server error 5xx, retry with exponential backoff
+                if resp.status_code >= 500:
+                    logger.warning(
+                        f"Remote MCP {method} {url} returned HTTP {resp.status_code} "
+                        f"(attempt {attempt}/{self.max_retries})"
+                    )
+                    if attempt < self.max_retries:
+                        sleep_time = self.backoff_factor * (2 ** (attempt - 1))
+                        time.sleep(sleep_time)
+                        continue
+                return resp
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.RequestException) as e:
+                last_exception = e
+                logger.warning(
+                    f"Remote MCP {method} {url} failed with {type(e).__name__}: {e} "
+                    f"(attempt {attempt}/{self.max_retries})"
+                )
+                if attempt < self.max_retries:
+                    sleep_time = self.backoff_factor * (2 ** (attempt - 1))
+                    time.sleep(sleep_time)
+                    continue
+
+        if last_exception:
+            raise last_exception
+        return last_resp
+
     def list_tools(self) -> List[Dict[str, Any]]:
         """
-        Executes GET /tools on the MCP server.
+        Executes GET /tools on the MCP server with retry logic.
         Returns tool definitions including parameter schemas.
         """
-        import requests
         url = f"{self.base_url}/tools"
-        resp = requests.get(url, timeout=10)
+        resp = self._request_with_retry("GET", url, timeout=10)
         resp.raise_for_status()
         return resp.json().get("tools", [])
 
@@ -232,8 +282,6 @@ class RemoteHttpMCPClient:
         return schemas
 
     def call_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        import requests
-
         if name in ("append_to_doc", "google_docs_create_document", "google_docs_append_text"):
             doc_id = arguments.get("doc_id") or os.getenv("GOOGLE_DOC_ID", "zomato_customer_pulse_doc")
             content = arguments.get("content", "")
@@ -241,13 +289,14 @@ class RemoteHttpMCPClient:
             url = f"{self.base_url}/append_to_doc"
 
             try:
-                resp = requests.post(url, json=payload, timeout=15)
+                resp = self._request_with_retry("POST", url, json=payload, timeout=15)
                 if resp.status_code == 200:
                     data = resp.json()
                     return {
                         "document_id": doc_id,
                         "document_url": f"https://docs.google.com/document/d/{doc_id}/edit",
-                        "raw_response": data
+                        "raw_response": data,
+                        "status": "success"
                     }
                 else:
                     # Return structured fallback if Google Doc ID does not exist on remote Google Drive
@@ -258,7 +307,7 @@ class RemoteHttpMCPClient:
                         "status": "appended_or_staged"
                     }
             except Exception as e:
-                logger.warning(f"Remote MCP append_to_doc error: {e}")
+                logger.warning(f"Remote MCP append_to_doc error after {self.max_retries} attempts: {e}")
                 return {
                     "document_id": doc_id,
                     "document_url": f"https://docs.google.com/document/d/{doc_id}/edit",
@@ -273,7 +322,7 @@ class RemoteHttpMCPClient:
             url = f"{self.base_url}/create_email_draft"
 
             try:
-                resp = requests.post(url, json=payload, timeout=15)
+                resp = self._request_with_retry("POST", url, json=payload, timeout=15)
                 if resp.status_code == 200:
                     data = resp.json()
                     return {
@@ -286,7 +335,7 @@ class RemoteHttpMCPClient:
                 else:
                     raise MCPError(f"Remote MCP create_email_draft failed ({resp.status_code}): {resp.text}")
             except Exception as e:
-                logger.warning(f"Remote MCP create_email_draft error: {e}")
+                logger.warning(f"Remote MCP create_email_draft error after {self.max_retries} attempts: {e}")
                 return {
                     "draft_id": "draft_remote_fallback",
                     "status": "created",
