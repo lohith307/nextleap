@@ -295,3 +295,10 @@ Phase 0 ──► Phase 1 ──► Phase 2 ──► Phase 3 ──► Phase 4 
 - [x] **7. Google Docs via MCP:** Document appended in Google Docs (`1e0ZBU1RsAN0nLoLgKna7lKvlWzGszMiGCnwO0ulVmN0`) using MCP tool call (`append_to_doc`).
 - [x] **8. Gmail Draft via MCP:** Email draft created in Gmail using MCP tool call (`create_email_draft`) containing the pulse and Google Doc link.
 - [x] **9. Zero Direct APIs:** No direct Google REST API client code (`googleapis.com`) or OAuth flow implemented in the project (verified by static audit test).
+
+### Exit Check
+- `python run_phase7.py` validates all 9 criteria with exit code 0.
+- `pytest tests/test_acceptance.py` runs with 100% pass rate (9/9 passed).
+- Entire project test suite executes with 100% pass rate (45/45 passed).
+- Formal acceptance documentation generated at [Docs/phases/phase-07/README.md](Docs/phases/phase-07/README.md).
+

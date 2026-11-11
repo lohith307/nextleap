@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-11T09:54:24.688007",
+  "timestamp": "2026-11-11T12:33:45.999965",
   "pipeline_status": "SUCCESS",
   "document_url": "https://docs.google.com/document/d/1e0ZBU1RsAN0nLoLgKna7lKvlWzGszMiGCnwO0ulVmN0/edit",
-  "draft_id": "r1025115988379798091",
+  "draft_id": "r3783009513989997393",
   "criteria_results": {
     "AC1_public_reviews": {
       "status": "PASSED",
@@ -48,9 +48,9 @@
     },
     "AC8_gmail_draft_mcp": {
       "status": "PASSED",
-      "draft_id": "r1025115988379798091",
+      "draft_id": "r3783009513989997393",
       "recipient": "product-team@zomato.internal",
-      "detail": "Created via MCP create_email_draft (Draft ID: r1025115988379798091) for product-team@zomato.internal"
+      "detail": "Created via MCP create_email_draft (Draft ID: r3783009513989997393) for product-team@zomato.internal"
     },
     "AC9_zero_direct_apis": {
       "status": "PASSED",
